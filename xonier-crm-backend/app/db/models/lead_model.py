@@ -1,0 +1,162 @@
+from beanie import Document, Link, before_event, Save, Insert, Replace, Indexed, PydanticObjectId
+from typing import Annotated, Optional, List
+from pydantic import StringConstraints, Field, field_validator, model_validator
+from app.db.models.user_model import UserModel
+from app.core.enums import PROJECT_TYPES, SALES_STATUS, PRIORITY, SOURCE, LANGUAGE_CODE, COUNTRY_CODE, INDUSTRIES, EMPLOYEE_SENIORITY, LEAD_SOURCE_TYPE, CONTACT_STATUS, MEETING_SCHEDULED
+from datetime import datetime, timezone
+from app.core.security import hash_password, hash_value
+from app.core.crypto import encryptor
+import phonenumbers
+from pymongo import IndexModel
+from app.db.models.base_model import BaseDocument
+from app.utils.custom_exception import AppException
+from app.db.models.calender_event_model import CalenderEventModel
+
+
+PhoneNumber = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=10,
+        max_length=15,
+        pattern=r"^\+?[1-9]\d{9,14}$"
+    )
+]
+
+class LeadsModel(BaseDocument):
+    lead_id: str
+    fullName: Optional[str] = Field(None, max_length=49)
+
+    email: Optional[str] = None
+    hashedEmail: Optional[str] = Indexed(default=None)
+    phone: Optional[str] = None
+    hashedPhone: Optional[str] = None
+    linkedin: Optional[str] = None
+    
+    priority: Optional[PRIORITY] = PRIORITY.MEDIUM.value
+    source: Optional[str] = SOURCE.OTHER.value 
+    projectType: Optional[str] = None
+    createdBy: Link[UserModel] 
+    status: Optional[str] = SALES_STATUS.NEW.value
+    # A disqualification is a terminal sales outcome, separate from the
+    # configurable pipeline stages.  Keeping its reason on the lead makes it
+    # reportable and prevents it being lost in an activity message.
+    disqualifiedReason: Optional[str] = Field(None, max_length=2000)
+    disqualifiedAt: Optional[datetime] = None
+    disqualifiedBy: Optional[Link[UserModel]] = None
+    dataTag: Optional[str] = None
+
+    companyName: Optional[str] = None
+    organizationId: Optional[PydanticObjectId] = None
+    personId: Optional[PydanticObjectId] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    postalCode: Optional[int] =  Field(None, gt=1000, lt=999999)
+    language: Optional[LANGUAGE_CODE] = None
+    connectStatus: Optional[CONTACT_STATUS] = CONTACT_STATUS.NOT_REACHED.value
+    followUpAt: Optional[datetime] = None  # Calculated next follow-up datetime
+    followUpOwnerId: Optional[PydanticObjectId] = None
+    industry: Optional[str] = None
+    employeeRole: Optional[str] = None
+    employeeSeniority: Optional[EMPLOYEE_SENIORITY] = None
+
+    meetingScheduled: MEETING_SCHEDULED = MEETING_SCHEDULED.NO.value
+    meetingTitle: Optional[str] = None
+    meetingDescription: Optional[str] = None
+    meetingStart: Optional[datetime] = None
+    meetingEnd: Optional[datetime] = None
+    meetingLink: Optional[str] = None
+    meetingPriority: Optional[PRIORITY] = None
+    meetingEventId: Optional[Link[CalenderEventModel]] = None
+ 
+    message: Optional[str] = None
+    membershipNotes: Optional[str] = None
+    assignedTo: Optional[List[Link[UserModel]]] = Field(default_factory=list)
+    leadSource: LEAD_SOURCE_TYPE = LEAD_SOURCE_TYPE.SELF_CREATED.value
+    isAssigned: bool = False
+    inDeal: bool = False
+    extraFields: Optional[dict[str, str | int | float | bool | None]] = Field(default=None)
+    assignedBy: Optional[Link[UserModel]] = None
+    assignedAt: Optional[datetime] = None
+    updatedBy: Optional[Link[UserModel]] = None
+    createdAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updatedAt: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    deletedBy: Optional[Link[UserModel]] = None
+    deletedAt: Optional[datetime] = None
+
+
+    class Settings:
+        name = "leads"
+        use_state_management = True
+        indexes = [
+            IndexModel(
+                [("lead_id", 1)],
+                unique=True,
+                name="unique_lead_id"
+            )
+        ]
+
+    @before_event(Insert, Replace, Save)
+    def encrypt_email(self):
+        if not self.email:
+            self.email = None
+            self.hashedEmail = None
+            return
+
+        if self.id is None:
+            plain_email = self.email.lower()
+            self.hashedEmail = hash_value(plain_email)
+            self.email = encryptor.encrypt_data(plain_email)
+            return
+
+        if "email" in self.get_changes():
+            plain_email:str = self.email.lower()
+            self.hashedEmail = hash_value(plain_email)
+            self.email = encryptor.encrypt_data(plain_email)
+
+    @before_event(Insert, Replace, Save)
+    def encrypt_phone(self):
+        if not self.phone:
+            self.phone = None
+            self.hashedPhone = None
+            return
+        
+        if self.id is None:
+            plain_phone = self.phone
+            self.phone = encryptor.encrypt_data(plain_phone)
+            self.hashedPhone = hash_value(plain_phone)
+            return
+        
+        if "phone" in self.get_changes():
+            plain_phone = self.phone
+            self.phone = encryptor.encrypt_data(plain_phone)
+            self.hashedPhone = hash_value(plain_phone)
+
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_meeting(cls, value):
+        isMeetingScheduled = value.get("meetingScheduled")
+
+        if isMeetingScheduled != MEETING_SCHEDULED.YES.value:
+            return value
+
+        meetingTitle = value.get("meetingTitle")
+        meetingDescription = value.get("meetingDescription")
+        meetingStart = value.get("meetingStart")
+        meetingEnd = value.get("meetingEnd")
+        meetingLink = value.get("meetingLink")
+        meetingPriority = value.get("meetingPriority")
+
+        if not meetingTitle or not meetingStart or not meetingEnd or not meetingLink or not meetingPriority:
+            raise AppException(422, f"{'Meeting Title' if not meetingTitle else 'Meeting Start Date' if not meetingStart else "Meeting End Date" if not meetingEnd else "Meeting Link" if not meetingLink else "Meeting Priority" if not meetingPriority else "unknown"} field is required" )
+
+
+        return value
+
+        
+
+
+        
+
+

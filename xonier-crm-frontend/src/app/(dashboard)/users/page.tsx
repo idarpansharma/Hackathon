@@ -1,0 +1,301 @@
+"use client";
+import UserMonitor from "@/src/components/pages/users/UserMonitor";
+import { UsersTable } from "@/src/components/pages/users/UsersTable";
+import { passwordCheck, RegisterPayload, User, UserRole } from "@/src/types";
+import axios from "axios";
+import React, { JSX, useState, useEffect, ChangeEvent, FormEvent, useCallback } from "react";
+import extractErrorMessages from "../../utils/error.utils";
+import { AuthService } from "@/src/services/auth.service";
+import { toast } from "react-toastify";
+import ConfirmPopup from "@/src/components/ui/ConfirmPopup";
+import { RoleService } from "@/src/services/role.service";
+import CompanyService from "@/src/services/company.service";
+import { Company } from "@/src/types/company/company.types";
+import { useSelector } from "react-redux";
+import { RootState } from "@/src/store";
+
+const COMPANY_PAGE_LIMIT = 10;
+
+const page = (): JSX.Element => {
+  const [err, setErr] = useState<string[] | string>("");
+  const [userData, setUserData] = useState<User[]>([]);
+  const [roleData, setRoleData] = useState<UserRole[]>([]);
+  const [companyLoading, setCompanyLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRoleLoading, setIsRoleLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentPage, setCurrentPages] = useState<number>(1);
+  const [pageLimit, setPageLimit] = useState<number>(10);
+  const [totalPage, setTotalPage] = useState<number>(1);
+  const [isPopupShow, setIsPopupShow] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>("");
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+
+  const [companyData, setCompanyData] = useState<Company[]>([]);
+  const [companyPage, setCompanyPage] = useState<number>(1);
+  const [companyHasMore, setCompanyHasMore] = useState<boolean>(true);
+    const Empty_form:RegisterPayload={
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          password: "",
+          confirmPassword: "",
+          userRole: [],
+          companyId: "",
+        }
+
+
+  const [formData, setFormData] = useState<RegisterPayload>(Empty_form);
+
+
+  const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
+
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const result = await AuthService.getAll({
+        page: currentPage,
+        limit: pageLimit || 10,
+        search: search || undefined,
+        companyId: selectedCompanyId || undefined,
+      });
+      if (result.status === 200) {
+        const resultData = result.data.data;
+        setUserData(resultData.data);
+        setCurrentPages(resultData.page);
+        setPageLimit(resultData.limit);
+        setTotalPage(resultData.totalPages);
+      }
+    } catch (error) {
+      process.env.NEXT_PUBLIC_ENV === "development" && console.error(error);
+      if (axios.isAxiosError(error)) setErr(extractErrorMessages(error));
+      else setErr(["Something went wrong"]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, pageLimit, search, selectedCompanyId]);
+
+  const getCompanyData = useCallback(
+    async (page: number) => {
+      if (companyLoading) return;
+      setCompanyLoading(true);
+      try {
+        const result = await CompanyService.getAll({
+          page,
+          limit: COMPANY_PAGE_LIMIT,
+        });
+        if (result.status === 200) {
+          const incoming: Company[] = result.data.data.data;
+          const totalPages: number = result.data.data.totalPages;
+          setCompanyData((prev) =>
+            page === 1 ? incoming : [...prev, ...incoming]
+          );
+          setCompanyHasMore(page < totalPages);
+        }
+      } catch (error) {
+        process.env.NEXT_PUBLIC_ENV === "development" && console.error(error);
+        if (axios.isAxiosError(error)) setErr(extractErrorMessages(error));
+        else setErr(["Something went wrong"]);
+      } finally {
+        setCompanyLoading(false);
+      }
+    },
+    [companyLoading]
+  );
+
+  const handleCompanyScrollEnd = useCallback(() => {
+    if (!companyHasMore || companyLoading) return;
+    const next = companyPage + 1;
+    setCompanyPage(next);
+    getCompanyData(next);
+  }, [companyHasMore, companyLoading, companyPage, getCompanyData]);
+
+  const getRoleData = async () => {
+    setIsRoleLoading(true)
+    try {
+      const result = await RoleService.getRolesWithoutPagination();
+      if (result.status === 200) setRoleData(result.data.data);
+    } catch (error) {
+      process.env.NEXT_PUBLIC_ENV === "development" && console.error(error);
+      if (axios.isAxiosError(error)) setErr(extractErrorMessages(error));
+      else setErr(["Something went wrong"]);
+    }finally{
+      setIsRoleLoading(false)
+    }
+  };
+
+  const handleDelete = async (id: string): Promise<void> => {
+    setErr("");
+    try {
+      const {isConfirmed} = await ConfirmPopup({
+        title: "Are you sure",
+        text: "Are you sure to delete this user",
+        btnTxt: "Yes, delete",
+      });
+      if (isConfirmed) {
+        const result = await AuthService.softDelete(id);
+        if (result.status === 200) {
+          toast.success("User deleted successfully");
+          await fetchUsers();
+        }
+      }
+    } catch (error) {
+      process.env.NEXT_PUBLIC_ENV === "development" && console.error(error);
+      if (axios.isAxiosError(error)) {
+        const messages = extractErrorMessages(error);
+        setErr(messages);
+        toast.error(`${messages}`);
+      } else {
+        setErr(["Something went wrong"]);
+      }
+    }
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUserRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const roleId = e.target.value;
+    if (!roleId) return;
+    // if (formData.userRole.length >= 1) {
+    //   toast.info("Currently only one user role allowed");
+    //   return;
+    // }
+    setFormData((prev) => ({ ...prev, userRole: [roleId] }));
+    e.target.value = "";
+  };
+
+  const handleCompanyChange = (companyId: string) => {
+    setFormData((prev) => ({ ...prev, companyId }));
+  };
+
+  const handleCompanyFilter = (companyId: string) => {
+    setSelectedCompanyId(companyId);
+    setCurrentPages(1);
+  };
+
+  const handleRemoveRole = (roleId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      userRole: prev.userRole.filter((id) => id !== roleId),
+    }));
+  };
+
+  useEffect(() => {
+    getRoleData();
+  }, []);
+
+  useEffect(() => {
+    if (isAdmin) getCompanyData(1);
+  }, [isAdmin]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [currentPage, pageLimit, search, selectedCompanyId]);
+
+
+const checks:passwordCheck[]=[
+  {label:'At least 8 characters',
+    valid: formData.password.length>=8,
+  },
+  {
+    label:'At least One uppercase letter',
+    valid: /[A-Z]/.test(formData.password),
+
+  },
+    {
+    label:'At least One lowercase letter',
+    valid:/[a-z]/.test(formData.password),
+
+  },
+    {
+    label:'At least One number',
+    valid:/[0-9]/.test(formData.password),
+
+  },
+    {
+    label:'At least One special character',
+    valid: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password),
+
+  },
+]
+
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErr("");
+    setLoading(true);
+   
+    if (formData.password !== formData.confirmPassword) {
+      setErr("Password not matching, please try again");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await AuthService.create(formData);
+      if (result.status === 201) {
+        toast.success(`${formData.firstName} ${formData.lastName} created successfully`);
+        setIsPopupShow(false);
+        await fetchUsers();
+        setFormData(Empty_form);
+      }
+    } catch (error) {
+      process.env.NEXT_PUBLIC_ENV === "development" && console.error(error);
+      if (axios.isAxiosError(error)) {
+        const messages = extractErrorMessages(error);
+        setErr(messages);
+        toast.error(`${messages}`);
+      } else {
+        setErr(["Something went wrong"]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <UserMonitor />
+      <UsersTable
+        emptyForm ={Empty_form}
+        currentPage={Number(currentPage)}
+        pageLimit={Number(pageLimit)}
+        userData={userData}
+        handleDelete={handleDelete}
+        isLoading={isLoading}
+        isRoleLoading={isRoleLoading}
+        isPopupShow={isPopupShow}
+        setIsPopupShow={setIsPopupShow}
+        formData={formData}
+        roleData={roleData}
+        handleChange={handleChange}
+        handleUserRoleChange={handleUserRoleChange}
+        handleRemoveRole={handleRemoveRole}
+        handleSubmit={handleSubmit}
+        err={err}
+        loading={loading}
+        setPageLimit={setPageLimit}
+        totalPage={totalPage}
+        setCurrentPages={setCurrentPages}
+        setSearchFilter={setSearch}
+        setFormData={setFormData}
+        isAdmin={isAdmin}
+        companyData={companyData}
+        companyLoading={companyLoading}
+        companyHasMore={companyHasMore}
+        handleCompanyChange={handleCompanyChange}
+        handleCompanyFilter={handleCompanyFilter}
+        onCompanyScrollEnd={handleCompanyScrollEnd}
+        selectedCompanyId={selectedCompanyId}
+        checks={checks}
+
+      />
+    </div>
+  );
+};
+
+export default page;

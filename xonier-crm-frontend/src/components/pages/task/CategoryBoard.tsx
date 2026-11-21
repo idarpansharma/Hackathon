@@ -1,0 +1,431 @@
+"use client";
+import { CategoryBoardProps, PendingDrop, TaskItem } from "@/src/types/task/task.types";
+import { useEffect, useRef, useState } from "react";
+import MarkFinalModal, { MarkFinalPayload } from "./Marrkfinalmodal";
+import { toast } from "react-toastify";
+import { getColorOption } from "./createStatusModal";
+import BoardCard from "./BoardCard";
+import { useTranslation } from "react-i18next";
+import { Check, CheckCircle2, Folder, Inbox } from "lucide-react";
+
+// Tunables
+const DRAG_ACTIVATE_DELAY = 80; // ms cursor must dwell in a column before it's "active"
+const SCROLL_EDGE_THRESHOLD = 180; // px from edge where auto-scroll kicks in
+const SCROLL_MAX_SPEED = 32; // px per frame at the very edge (fast)
+const SCROLL_MIN_SPEED = 4;
+
+function CategoryBoard({
+  categoryId,
+  categoryName,
+  categoryColor,
+  categoryIcon,
+  tasks,
+  statuses,
+  canEdit,
+  canRemark,
+  canDelete,
+  canViewTimer,
+  canStartTimer,
+  canPauseTimer,
+  canResumeTimer,
+  canStopTimer,
+  canChangeStatus,
+  canMarkFinal,
+  deleting,
+  taskTimerMap,
+  activeTimerTaskId,
+  liveElapsedSeconds,
+  onEdit,
+  onDelete,
+  onStatusChange,
+  onRemark,
+  onTimer,
+  onStop,
+}: CategoryBoardProps) {
+  const { t } = useTranslation();
+  const boardRef = useRef<HTMLDivElement>(null);
+
+  // --- Auto-scroll (rAF based, smooth, eased, window-driven) ---
+  const scrollAnimationRef = useRef<number | null>(null);
+  const scrollDirectionRef = useRef<0 | 1 | -1>(0);
+  const scrollSpeedRef = useRef(0);
+  const isDraggingRef = useRef(false);
+
+  // --- Drag state ---
+  const [dragOverStatusId, setDragOverStatusId] = useState<string | null>(null);
+  const dragTaskRef = useRef<TaskItem | null>(null);
+  const dragCounterRef = useRef<Record<string, number>>({});
+  const dragActivateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [pendingDrop, setPendingDrop] = useState<PendingDrop | null>(null);
+
+  // ---------------- Auto scroll engine (rAF) ----------------
+  const tickScroll = () => {
+    const container = boardRef.current;
+    if (container && scrollDirectionRef.current !== 0 && isDraggingRef.current) {
+      container.scrollLeft += scrollDirectionRef.current * scrollSpeedRef.current;
+      scrollAnimationRef.current = requestAnimationFrame(tickScroll);
+    } else {
+      scrollAnimationRef.current = null;
+    }
+  };
+
+  const startAutoScroll = (direction: 1 | -1, speed: number) => {
+    scrollDirectionRef.current = direction;
+    scrollSpeedRef.current = speed;
+    if (!scrollAnimationRef.current) {
+      scrollAnimationRef.current = requestAnimationFrame(tickScroll);
+    }
+  };
+
+  const stopAutoScroll = () => {
+    scrollDirectionRef.current = 0;
+    scrollSpeedRef.current = 0;
+    if (scrollAnimationRef.current) {
+      cancelAnimationFrame(scrollAnimationRef.current);
+      scrollAnimationRef.current = null;
+    }
+  };
+
+  // Eased speed curve: quadratic ramp feels smoother & reaches top speed faster near edge
+  const computeScrollFromClientX = (clientX: number) => {
+    const container = boardRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+
+    if (clientX < rect.left + SCROLL_EDGE_THRESHOLD) {
+      const raw = Math.min(1, (rect.left + SCROLL_EDGE_THRESHOLD - clientX) / SCROLL_EDGE_THRESHOLD);
+      const intensity = raw * raw; // ease-in quadratic
+      const speed = SCROLL_MIN_SPEED + intensity * (SCROLL_MAX_SPEED - SCROLL_MIN_SPEED);
+      startAutoScroll(-1, speed);
+    } else if (clientX > rect.right - SCROLL_EDGE_THRESHOLD) {
+      const raw = Math.min(1, (clientX - (rect.right - SCROLL_EDGE_THRESHOLD)) / SCROLL_EDGE_THRESHOLD);
+      const intensity = raw * raw;
+      const speed = SCROLL_MIN_SPEED + intensity * (SCROLL_MAX_SPEED - SCROLL_MIN_SPEED);
+      startAutoScroll(1, speed);
+    } else {
+      stopAutoScroll();
+    }
+  };
+   const resetDragState = () => {
+    dragCounterRef.current = {};
+    if (dragActivateTimeoutRef.current) {
+      clearTimeout(dragActivateTimeoutRef.current);
+      dragActivateTimeoutRef.current = null;
+    }
+    setDragOverStatusId(null);
+  };
+
+  // ---------------- Global drag tracking ----------------
+  // This keeps auto-scroll + drag alive even when the cursor moves over
+  // elements outside this board (sidebar, other page sections, nav links, etc.)
+  useEffect(() => {
+    const handleWindowDragOver = (e: DragEvent) => {
+      if (!isDraggingRef.current) return;
+      e.preventDefault(); // keep drag alive / allow continued dragover anywhere
+      computeScrollFromClientX(e.clientX);
+    };
+
+    const handleWindowDrop = () => {
+      stopAutoScroll();
+      isDraggingRef.current = false;
+    };
+
+    const handleWindowDragEnd = () => {
+      stopAutoScroll();
+      isDraggingRef.current = false;
+      resetDragState();
+      dragTaskRef.current = null;
+    };
+
+    window.addEventListener("dragover", handleWindowDragOver);
+    window.addEventListener("drop", handleWindowDrop);
+    window.addEventListener("dragend", handleWindowDragEnd);
+
+    return () => {
+      window.removeEventListener("dragover", handleWindowDragOver);
+      window.removeEventListener("drop", handleWindowDrop);
+      window.removeEventListener("dragend", handleWindowDragEnd);
+      stopAutoScroll();
+      if (dragActivateTimeoutRef.current) clearTimeout(dragActivateTimeoutRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleDragStart = (e: React.DragEvent, task: TaskItem) => {
+    dragTaskRef.current = task;
+    isDraggingRef.current = true;
+    e.dataTransfer.effectAllowed = "move";
+    const el = e.currentTarget as HTMLElement;
+    setTimeout(() => { el.style.opacity = "0.5"; }, 0);
+    e.currentTarget.addEventListener("dragend", () => { el.style.opacity = "1"; }, { once: true });
+  };
+
+  // ---------------- Column enter/leave with dwell-based activation ----------------
+  const handleDragEnter = (e: React.DragEvent, statusId: string) => {
+    e.preventDefault();
+    dragCounterRef.current[statusId] = (dragCounterRef.current[statusId] || 0) + 1;
+
+    if (dragActivateTimeoutRef.current) clearTimeout(dragActivateTimeoutRef.current);
+    dragActivateTimeoutRef.current = setTimeout(() => {
+      if ((dragCounterRef.current[statusId] || 0) > 0) {
+        setDragOverStatusId(statusId);
+      }
+    }, DRAG_ACTIVATE_DELAY);
+  };
+
+  const handleDragOverColumn = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragLeaveColumn = (e: React.DragEvent, statusId: string) => {
+    dragCounterRef.current[statusId] = Math.max(0, (dragCounterRef.current[statusId] || 0) - 1);
+
+    if (dragCounterRef.current[statusId] === 0) {
+      if (dragActivateTimeoutRef.current) {
+        clearTimeout(dragActivateTimeoutRef.current);
+        dragActivateTimeoutRef.current = null;
+      }
+      setDragOverStatusId((prev) => (prev === statusId ? null : prev));
+    }
+  };
+
+ 
+
+  const handleDrop = (e: React.DragEvent, targetStatusId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    stopAutoScroll();
+    isDraggingRef.current = false;
+
+    const task = dragTaskRef.current;
+    dragTaskRef.current = null;
+
+    const wasActivated = dragOverStatusId === targetStatusId;
+    resetDragState();
+
+    if (!task || !wasActivated) return;
+    if (task.status.id === targetStatusId) return;
+
+    const targetStatus = statuses.find((s) => s.id === targetStatusId);
+    if (!targetStatus) return;
+
+    if (targetStatus.isFinal) {
+      if (!canMarkFinal) { toast.error("You don't have permission to mark tasks as final."); return; }
+      setPendingDrop({ task, targetStatus, categoryId });
+      return;
+    }
+    if (!canChangeStatus) { toast.error("No permission to change status."); return; }
+    onStatusChange(task.id, { status: targetStatusId, category: categoryId });
+  };
+
+  const handleFinalConfirm = async (payload: MarkFinalPayload) => {
+    if (!pendingDrop) return;
+    const { task, targetStatus } = pendingDrop;
+    setPendingDrop(null);
+    await onStatusChange(task.id, {
+      status: targetStatus.id,
+      category: categoryId,
+      remark: payload.remark,
+      rating: payload.feedbackStars,
+      actual_hours: payload.actualHours,
+      actual_days: payload.actualDays,
+    });
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    stopAutoScroll();
+    isDraggingRef.current = false;
+    resetDragState();
+    dragTaskRef.current = null;
+  };
+
+  const isCategoryEmoji = categoryIcon && categoryIcon !== "❓" && categoryIcon !== "?";
+
+  return (
+    <>
+      <div className="relative">
+        {/* Category Swimlane Header Bar */}
+        <div className="grid grid-cols-8 h-full  rounded-xl w-full items-center gap-3 mb-4 pb-3 border-b border-slate-200/80 dark:border-slate-800 sticky self-start top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm z-30 p-2">
+          <div className="flex items-center gap-3 min-w-0 col-span-2">
+            <div className="flex gap-2 items-center">
+              <span
+                className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-sm shadow-2xs shrink-0"
+                style={{
+                  backgroundColor: categoryColor ? `${categoryColor}15` : "rgba(100, 116, 139, 0.1)",
+                  color: categoryColor || "#0891b2",
+                  border: `1px solid ${categoryColor ? `${categoryColor}30` : "rgba(100, 116, 139, 0.2)"}`,
+                }}
+              >
+                {isCategoryEmoji ? categoryIcon : <Folder size={16} />}
+              </span>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight truncate">
+                {categoryName}
+              </h2>
+            </div>
+            <div className="flex items-center min-w-0">
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80 tabular-nums">
+                {tasks.length} {tasks.length !== 1 ? t("tasks") : t("task")}
+              </span>
+            </div>
+          </div>
+
+          {/* Status Breakdown Summary Pills */}
+          <div className="flex items-center gap-1.5 flex-wrap justify-end col-span-6 max-h-12 overflow-scroll">
+            {statuses.map((s) => {
+              const count = tasks.filter((t) => t?.status?.id === s.id).length;
+              const dotColor = s.color && s.color.toLowerCase() !== "#ffffff" ? s.color : "#0891b2";
+              return (
+                <span
+                  key={s.id}
+                  className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-lg bg-slate-50 dark:bg-slate-800/80 border border-slate-200/70 dark:border-slate-700/70 text-slate-600 dark:text-slate-400"
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: dotColor }}
+                  />
+                  <span className="truncate max-w-[90px]">{s.name}</span>
+                  <span className="font-bold text-slate-900 dark:text-white tabular-nums">{count}</span>
+                  {s.isFinal && <Check size={10} className="text-emerald-500 shrink-0" />}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Board Columns Scroll Area */}
+        <div
+          ref={boardRef}
+          className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar items-start scroll-smooth"
+          onDrop={() => { stopAutoScroll(); isDraggingRef.current = false; }}
+        >
+          {statuses.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center py-12 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 text-slate-400">
+              <Inbox className="w-8 h-8 mb-2 opacity-50" />
+              <p className="text-xs font-medium">{t("no_statuses_for_this_category")}</p>
+            </div>
+          ) : (
+            statuses.map((status) => {
+              const columnTasks = tasks.filter((t) => t?.status?.id === status.id);
+              const isDragOver = dragOverStatusId === status.id;
+              const isFinal = status.isFinal;
+              const dotColor =
+                status.color && status.color.toLowerCase() !== "#ffffff"
+                  ? status.color
+                  : "#0891b2";
+
+              return (
+                <div
+                  key={status.id}
+                  className={`flex flex-col rounded-2xl transition-all duration-150 ease-out min-w-[280px] max-w-[315px] flex-shrink-0 p-2.5 max-h-[500px] ${
+                    isDragOver
+                      ? "border-2 border-cyan-500 bg-cyan-50/40 dark:bg-cyan-950/30 ring-2 ring-cyan-500/20 scale-[1.01]"
+                      : "border border-slate-200/80 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/50 scale-100"
+                  }`}
+                  onDragEnter={(e) => handleDragEnter(e, status.id)}
+                  onDragOver={handleDragOverColumn}
+                  onDragLeave={(e) => handleDragLeaveColumn(e, status.id)}
+                  onDrop={(e) => handleDrop(e, status.id)}
+                >
+                  {/* Scrolling container: header sits directly inside and sticks to top-0 */}
+                  <div className="flex-1 overflow-y-auto min-h-[140px] max-h-[600px] custom-scrollbar px-0.5">
+
+                    {/* Sticky Header with non-transparent solid background */}
+                    <div className="sticky top-0 z-20 flex items-center justify-between px-3 py-2.5 mb-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs bg-white dark:bg-slate-800">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {isFinal ? (
+                          <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
+                        ) : (
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs ring-2 ring-slate-100 dark:ring-slate-700"
+                            style={{ backgroundColor: dotColor }}
+                          />
+                        )}
+                        <h3 className="text-xs font-bold text-slate-900 dark:text-white capitalize truncate tracking-tight">
+                          {status.name}
+                        </h3>
+                        <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full tabular-nums shrink-0">
+                          {columnTasks.length}
+                        </span>
+                      </div>
+
+                      {isFinal && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 shrink-0">
+                          <Check size={9} strokeWidth={3} />
+                          {t("final_2")}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Task List */}
+                    <div className="space-y-2.5 pb-1">
+                      {columnTasks.length === 0 ? (
+                        <div
+                          className={`flex flex-col items-center justify-center py-8 rounded-xl border border-dashed transition-colors duration-150 ${
+                            isDragOver
+                              ? "border-cyan-400 bg-cyan-50/50 dark:bg-cyan-900/60"
+                              : "border-slate-200 dark:border-slate-700/60"
+                          }`}
+                        >
+                          <Inbox className="w-5 h-5 mb-1 text-slate-300 dark:text-slate-600" />
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                            {isDragOver ? t("drop_here") : t("no_task")}
+                          </p>
+                        </div>
+                      ) : (
+                        columnTasks.map((task) => (
+                          <BoardCard
+                            key={task.id}
+                            task={task}
+                            handleDragEnd={handleDragEnd}
+                            canEdit={canEdit}
+                            canRemark={canRemark}
+                            canDelete={canDelete}
+                            canViewTimer={canViewTimer}
+                            canStartTimer={canStartTimer}
+                            canPauseTimer={canPauseTimer}
+                            canResumeTimer={canResumeTimer}
+                            canStopTimer={canStopTimer}
+                            deleting={deleting}
+                            taskTimerMap={taskTimerMap}
+                            activeTimerTaskId={activeTimerTaskId}
+                            liveElapsedSeconds={liveElapsedSeconds}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                            onDragStart={handleDragStart}
+                            onRemark={onRemark}
+                            onTimer={onTimer}
+                            onStop={onStop}
+                          />
+                        ))
+                      )}
+
+                      {columnTasks.length > 0 && isDragOver && (
+                        <div className="flex items-center justify-center py-2.5 rounded-xl border border-dashed border-cyan-400 dark:border-cyan-500 bg-cyan-50/60 dark:bg-cyan-950/20">
+                          <p className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">{t("drop_here")}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {pendingDrop && (
+        <MarkFinalModal
+          taskTitle={pendingDrop.task.title}
+          statusName={pendingDrop.targetStatus.name}
+          statusColor={pendingDrop.targetStatus.color ?? "#22c55e"}
+          onConfirm={handleFinalConfirm}
+          onCancel={() => setPendingDrop(null)}
+        />
+      )}
+    </>
+  );
+}
+
+export default CategoryBoard;

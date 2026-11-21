@@ -1,0 +1,4 @@
+node_modules/
+.env
+xonier-crm-backend/.env
+.vscode

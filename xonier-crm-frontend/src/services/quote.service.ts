@@ -1,0 +1,39 @@
+import api from "../lib/axios";
+import { QuotationCreatePayload, QuotationUpdatePayload, QuoteStatusUpdatePayload } from "../types/quotations/quote.types";
+
+
+export const QuoteService = {
+    getAll: (page?: number, limit?: number, filters?: Record<string, any>)=>{
+    const params = new URLSearchParams();
+
+    if (page) params.append("page", String(page));
+    if (limit) params.append("limit", String(limit));
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          params.append(key, String(value));
+        }
+      });
+    }
+
+    return api.get(`/quote/get-all?${params.toString()}`);
+  },
+  uploadFiles: (dealId: any, formData: FormData) => {
+  return api.post(`/deal/${dealId}/files`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+},
+  get_by_id: (id:string)=> api.get(`/quote/get-by-id/${id}`),
+  get_data_with_token: (token: string)=> api.get(`/quote/public/${token}`),
+  confirm: (token: string)=> api.post(`/quote/confirm/${token}`),
+  create: (payload: QuotationCreatePayload)=> api.post("/quote/create", payload),
+  update: (id: string, payload: QuotationUpdatePayload)=> api.put(`/quote/update/${id}`, payload),
+  updateStatus: (id: string, payload: QuoteStatusUpdatePayload)=> api.patch(`/quote/update/status/${id}`, payload),
+  resend: (id:string)=> api.post(`/quote/resend/${id}`, {}), 
+  download: (id: string) => api.get(`/quote/download/${id}`, { responseType: 'blob' }),
+  delete: (id:string)=> api.delete(`/quote/delete/${id}`)
+ 
+}

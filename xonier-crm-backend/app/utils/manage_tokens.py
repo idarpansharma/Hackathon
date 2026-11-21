@@ -1,0 +1,39 @@
+from jose import jwt, ExpiredSignatureError, JWTError
+from  app.core.config import get_setting
+from app.utils.custom_exception import AppException
+
+
+settings = get_setting()
+
+def verify_access_token(token: str):
+    try:
+        payload = jwt.decode(
+            token,
+            settings.ACCESS_TOKEN_SECRET,
+            algorithms=[settings.ALGORITHM],
+        )
+        return payload
+
+    except ExpiredSignatureError:
+        return None  
+
+    except JWTError:
+        return None
+    
+def verify_refresh_token(token: str):
+    try:
+        payload = jwt.decode(
+            token,
+            settings.REFRESH_TOKEN_SECRET,
+            algorithms=[settings.ALGORITHM],
+        )
+        return payload
+
+    except ExpiredSignatureError:
+        raise AppException(401, "Refresh token expired, please login again")
+
+    except JWTError:
+        raise AppException(401, "Invalid refresh token")
+
+
+

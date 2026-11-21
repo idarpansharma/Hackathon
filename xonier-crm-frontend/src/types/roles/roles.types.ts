@@ -1,0 +1,62 @@
+import { Dispatch, SetStateAction } from "react";
+import { User, UserRole } from "../auth/auth.types";
+
+export interface GetAllRolesPayload {
+  currentPage?: number;
+  pageLimit?: number;
+  filter?: {
+    search?: string;
+    name?: string;
+    code?: string;
+    action?: string;
+  };
+}
+
+export interface Permissions{
+    id: string;
+    code: string;
+    module: string;
+    action: string;
+    title: string;
+    description: string;
+    is_active: boolean;
+    deleted_at: Date | null;
+    created_at: Date;
+    updated_at: Date;
+}
+
+
+
+// Props
+
+export interface RoleTableProps {
+    roleData: UserRole[];
+  permissionData: Array<Permissions> | null;
+  currentPage: number;
+  pageLimit: number;
+  handleDelete: (id: string) => Promise<void>;
+  isLoading?: boolean;
+  isPopupShow: boolean;
+  setIsPopupShow: Dispatch<SetStateAction<boolean>>;
+
+  formData: UserRolePayload;
+  setFormData: Dispatch<SetStateAction<UserRolePayload>>;
+  handleSubmit: () => Promise<void>;
+  hasPermissions: (permission: string)=>boolean
+  isAdmin: boolean
+
+ searchVal: string;
+  onSearch: (val: string) => void;
+
+  totalPages:number,
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  setPageLimit: Dispatch<SetStateAction<number>>;
+}
+
+
+export interface UserRolePayload {
+    name: string;
+    permissions: string[];
+    power: number;
+    canManageBelow: boolean;
+}

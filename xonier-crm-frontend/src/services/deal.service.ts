@@ -1,0 +1,35 @@
+import { ParamValue } from "next/dist/server/request/params";
+import api from "../lib/axios";
+import { DealPayload, DealStageUpdatePayload, DealUpdatePayload, GetAllParams } from "../types/deals/deal.types";
+
+
+
+const dealService = {
+    create: (payload: DealPayload)=> api.post("/deal/create", payload),
+    getAll: (page?: number, limit?: number, filters?: Record<string, any>)=>{
+    const params = new URLSearchParams();
+
+    if (page) params.append("page", String(page));
+    if (limit) params.append("limit", String(limit));
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          params.append(key, String(value));
+        }
+      });
+    }
+
+    return api.get(`/deal/all?${params.toString()}`);
+  },
+  getById: (id:ParamValue) => api.get(`/deal/get-by-id/${id}`),
+  update:(id: ParamValue, payload:DealUpdatePayload)=> api.put(`/deal/update/${id}`, payload),
+  delete:(id:string)=> api.delete(`/deal/delete/${id}`),
+  bulkAssign:(deal_ids: string[], assigned_to: string)=> api.patch(`/deal/bulk-assign`, { deal_ids, assigned_to }),
+  updateStage:(id: string, stageOrPayload: string | DealStageUpdatePayload)=> api.patch(
+    `/deal/update/${id}/stage`,
+    typeof stageOrPayload === "string" ? { dealStage: stageOrPayload } : stageOrPayload
+  ),
+}
+
+export default dealService

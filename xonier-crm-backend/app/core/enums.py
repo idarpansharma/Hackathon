@@ -1,0 +1,1166 @@
+from pydantic import BaseModel
+from enum import Enum
+from typing import Optional
+
+
+class USER_ROLES(str, Enum):
+    SUPER_ADMIN = "super_admin"
+    ADMIN = "admin"
+    MANAGER = "manager"
+    SALES = "sales"
+    SUPPORT = "support"
+    USER = "user"
+
+class USER_STATUS(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    SUSPENDED = "suspended"
+    DELETED = "deleted"
+
+
+class OTP_TYPE(str, Enum):
+    EMAIL_VERIFICATION = "email_verification"
+    PHONE_VERIFICATION = "phone_verification"
+
+    LOGIN = "login"
+    TWO_FACTOR_AUTH = "two_factor_auth"
+
+    PASSWORD_RESET = "password_reset"
+    CHANGE_PASSWORD = "change_password"
+    FORGOT_PASSWORD = "forgot_password"
+    ACCOUNT_RECOVERY = "account_recovery"
+
+    TRANSACTION = "transaction"
+    PAYMENT_CONFIRMATION = "payment_confirmation"
+
+    INVITE_ACCEPTANCE = "invite_acceptance"
+    EMAIL_VERIFICATION_AND_FORGOT_PASSWORD = "email_verification_and_forgot_password"
+
+class OTP_EXPIRY(int, Enum):
+    TEN_MINUTS = 10
+    FIFTEEN_MINUTS = 15
+    THIRTY_MINUTS = 30
+
+
+
+class PROJECT_TYPES(str, Enum):
+   
+    MOBILE_APP = "mobile_app"
+    WEBSITE = "website"
+    WEB_APP = "web_app"
+    CRM = "crm"
+    ERP = "erp"
+    CUSTOM_SOFTWARE = "custom_software"
+
+    AI_ML = "ai_ml"
+    DATA_SCIENCE = "data_science"
+    BLOCKCHAIN = "blockchain"
+    IOT = "iot"
+
+    UI_UX_DESIGN = "ui_ux_design"
+    GRAPHIC_DESIGN = "graphic_design"
+    BRANDING = "branding"
+
+
+    DIGITAL_MARKETING = "digital_marketing"
+    SEO = "seo"
+    SOCIAL_MEDIA_MARKETING = "social_media_marketing"
+    CONTENT_MARKETING = "content_marketing"
+
+
+    TESTING = "testing"
+    QA_AUTOMATION = "qa_automation"
+    MAINTENANCE_SUPPORT = "maintenance_support"
+
+    CLOUD_SERVICES = "cloud_services"
+    DEVOPS = "devops"
+    CYBER_SECURITY = "cyber_security"
+
+
+    ECOMMERCE = "ecommerce"
+    CMS = "cms"
+
+    IT_CONSULTING = "it_consulting"
+    PRODUCT_CONSULTING = "product_consulting"
+    OTHER="other"
+
+class SALES_STATUS(str, Enum):
+    NEW = "new"
+    CONTACTED = "contacted"
+    QUALIFIED = "qualified"
+    PROPOSAL = "proposal"
+    WON = "won"
+    LOST = "lost"
+    DELETE = "delete"
+
+
+class MEETING_SCHEDULED(str, Enum):
+    YES="yes"
+    NO="no"
+
+class PRIORITY(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+class SOURCE(str, Enum):
+   
+    WEBSITE = "website"
+    CHATBOT = "chatbot"
+    EMAIL = "email"
+    NEWSLETTER = "newsletter"
+
+    CALL = "call"
+    WHATSAPP = "whatsapp"
+    SMS = "sms"
+    WALK_IN = "walk_in"
+
+    AD = "ad"
+    GOOGLE_ADS = "google_ads"
+    FACEBOOK_ADS = "facebook_ads"
+    LINKEDIN_ADS = "linkedin_ads"
+    INSTAGRAM_ADS = "instagram_ads"
+
+    REFERRAL = "referral"
+    PARTNER = "partner"
+    AFFILIATE = "affiliate"
+    RESELLER = "reseller"
+
+    COLD_CALL = "cold_call"
+    COLD_EMAIL = "cold_email"
+    LINKEDIN_OUTREACH = "linkedin_outreach"
+
+    UPWORK = "upwork"
+    FIVERR = "fiverr"
+    FREELANCER = "freelancer"
+    TOPTAL = "toptal"
+
+    EVENT = "event"
+    CONFERENCE = "conference"
+    MEETUP = "meetup"
+    EXHIBITION = "exhibition"
+
+    OTHER = "other"
+
+
+class COUNTRY_CODE(str, Enum):
+    AFGHANISTAN = "AF"
+    ALAND_ISLANDS = "AX"
+    ALBANIA = "AL"
+    ALGERIA = "DZ"
+    AMERICAN_SAMOA = "AS"
+    ANDORRA = "AD"
+    ANGOLA = "AO"
+    ANGUILLA = "AI"
+    ANTARCTICA = "AQ"
+    ANTIGUA_AND_BARBUDA = "AG"
+    ARGENTINA = "AR"
+    ARMENIA = "AM"
+    ARUBA = "AW"
+    AUSTRALIA = "AU"
+    AUSTRIA = "AT"
+    AZERBAIJAN = "AZ"
+    BAHAMAS = "BS"
+    BAHRAIN = "BH"
+    BANGLADESH = "BD"
+    BARBADOS = "BB"
+    BELARUS = "BY"
+    BELGIUM = "BE"
+    BELIZE = "BZ"
+    BENIN = "BJ"
+    BERMUDA = "BM"
+    BHUTAN = "BT"
+    BOLIVIA = "BO"
+    BOSNIA_AND_HERZEGOVINA = "BA"
+    BOTSWANA = "BW"
+    BOUVET_ISLAND = "BV"
+    BRAZIL = "BR"
+    BRITISH_INDIAN_OCEAN_TERRITORY = "IO"
+    BRUNEI = "BN"
+    BULGARIA = "BG"
+    BURKINA_FASO = "BF"
+    BURUNDI = "BI"
+    CAMBODIA = "KH"
+    CAMEROON = "CM"
+    CANADA = "CA"
+    CAPE_VERDE = "CV"
+    CAYMAN_ISLANDS = "KY"
+    CENTRAL_AFRICAN_REPUBLIC = "CF"
+    CHAD = "TD"
+    CHILE = "CL"
+    CHINA = "CN"
+    CHRISTMAS_ISLAND = "CX"
+    COCOS_KEELING_ISLANDS = "CC"
+    COLOMBIA = "CO"
+    COMOROS = "KM"
+    CONGO = "CG"
+    CONGO_DEMOCRATIC_REPUBLIC = "CD"
+    COOK_ISLANDS = "CK"
+    COSTA_RICA = "CR"
+    COTE_DIVOIRE = "CI"
+    CROATIA = "HR"
+    CUBA = "CU"
+    CYPRUS = "CY"
+    CZECH_REPUBLIC = "CZ"
+    DENMARK = "DK"
+    DJIBOUTI = "DJ"
+    DOMINICA = "DM"
+    DOMINICAN_REPUBLIC = "DO"
+    ECUADOR = "EC"
+    EGYPT = "EG"
+    EL_SALVADOR = "SV"
+    EQUATORIAL_GUINEA = "GQ"
+    ERITREA = "ER"
+    ESTONIA = "EE"
+    ESWATINI = "SZ"
+    ETHIOPIA = "ET"
+    FALKLAND_ISLANDS = "FK"
+    FAROE_ISLANDS = "FO"
+    FIJI = "FJ"
+    FINLAND = "FI"
+    FRANCE = "FR"
+    FRENCH_GUIANA = "GF"
+    FRENCH_POLYNESIA = "PF"
+    GABON = "GA"
+    GAMBIA = "GM"
+    GEORGIA = "GE"
+    GERMANY = "DE"
+    GHANA = "GH"
+    GIBRALTAR = "GI"
+    GREECE = "GR"
+    GREENLAND = "GL"
+    GRENADA = "GD"
+    GUADELOUPE = "GP"
+    GUAM = "GU"
+    GUATEMALA = "GT"
+    GUERNSEY = "GG"
+    GUINEA = "GN"
+    GUINEA_BISSAU = "GW"
+    GUYANA = "GY"
+    HAITI = "HT"
+    HONDURAS = "HN"
+    HONG_KONG = "HK"
+    HUNGARY = "HU"
+    ICELAND = "IS"
+    INDIA = "IN"
+    INDONESIA = "ID"
+    IRAN = "IR"
+    IRAQ = "IQ"
+    IRELAND = "IE"
+    ISLE_OF_MAN = "IM"
+    ISRAEL = "IL"
+    ITALY = "IT"
+    JAMAICA = "JM"
+    JAPAN = "JP"
+    JERSEY = "JE"
+    JORDAN = "JO"
+    KAZAKHSTAN = "KZ"
+    KENYA = "KE"
+    KIRIBATI = "KI"
+    KUWAIT = "KW"
+    KYRGYZSTAN = "KG"
+    LAOS = "LA"
+    LATVIA = "LV"
+    LEBANON = "LB"
+    LESOTHO = "LS"
+    LIBERIA = "LR"
+    LIBYA = "LY"
+    LIECHTENSTEIN = "LI"
+    LITHUANIA = "LT"
+    LUXEMBOURG = "LU"
+    MACAO = "MO"
+    MADAGASCAR = "MG"
+    MALAWI = "MW"
+    MALAYSIA = "MY"
+    MALDIVES = "MV"
+    MALI = "ML"
+    MALTA = "MT"
+    MARSHALL_ISLANDS = "MH"
+    MARTINIQUE = "MQ"
+    MAURITANIA = "MR"
+    MAURITIUS = "MU"
+    MEXICO = "MX"
+    MICRONESIA = "FM"
+    MOLDOVA = "MD"
+    MONACO = "MC"
+    MONGOLIA = "MN"
+    MONTENEGRO = "ME"
+    MOROCCO = "MA"
+    MOZAMBIQUE = "MZ"
+    MYANMAR = "MM"
+    NAMIBIA = "NA"
+    NAURU = "NR"
+    NEPAL = "NP"
+    NETHERLANDS = "NL"
+    NEW_ZEALAND = "NZ"
+    NICARAGUA = "NI"
+    NIGER = "NE"
+    NIGERIA = "NG"
+    NORTH_KOREA = "KP"
+    NORTH_MACEDONIA = "MK"
+    NORWAY = "NO"
+    OMAN = "OM"
+    PAKISTAN = "PK"
+    PANAMA = "PA"
+    PAPUA_NEW_GUINEA = "PG"
+    PARAGUAY = "PY"
+    PERU = "PE"
+    PHILIPPINES = "PH"
+    POLAND = "PL"
+    PORTUGAL = "PT"
+    PUERTO_RICO = "PR"
+    QATAR = "QA"
+    ROMANIA = "RO"
+    RUSSIA = "RU"
+    RWANDA = "RW"
+    SAUDI_ARABIA = "SA"
+    SENEGAL = "SN"
+    SERBIA = "RS"
+    SINGAPORE = "SG"
+    SLOVAKIA = "SK"
+    SLOVENIA = "SI"
+    SOUTH_AFRICA = "ZA"
+    SOUTH_KOREA = "KR"
+    SPAIN = "ES"
+    SRI_LANKA = "LK"
+    SUDAN = "SD"
+    SURINAME = "SR"
+    SWEDEN = "SE"
+    SWITZERLAND = "CH"
+    SYRIA = "SY"
+    TAIWAN = "TW"
+    TAJIKISTAN = "TJ"
+    TANZANIA = "TZ"
+    THAILAND = "TH"
+    TOGO = "TG"
+    TONGA = "TO"
+    TRINIDAD_AND_TOBAGO = "TT"
+    TUNISIA = "TN"
+    TURKEY = "TR"
+    TURKMENISTAN = "TM"
+    UGANDA = "UG"
+    UKRAINE = "UA"
+    UNITED_ARAB_EMIRATES = "AE"
+    UNITED_KINGDOM = "GB"
+    UNITED_STATES = "US"
+    URUGUAY = "UY"
+    UZBEKISTAN = "UZ"
+    VENEZUELA = "VE"
+    VIETNAM = "VN"
+    YEMEN = "YE"
+    ZAMBIA = "ZM"
+    ZIMBABWE = "ZW"
+
+
+
+class LANGUAGE_CODE(str, Enum):
+    ENGLISH = "en"
+    SPANISH = "es"
+    FRENCH = "fr"
+    GERMAN = "de"
+    ITALIAN = "it"
+    PORTUGUESE = "pt"
+    DUTCH = "nl"
+    RUSSIAN = "ru"
+    UKRAINIAN = "uk"
+    POLISH = "pl"
+    CZECH = "cs"
+    SLOVAK = "sk"
+    HUNGARIAN = "hu"
+    ROMANIAN = "ro"
+    BULGARIAN = "bg"
+    GREEK = "el"
+    TURKISH = "tr"
+
+    ARABIC = "ar"
+    HEBREW = "he"
+    PERSIAN = "fa"
+    URDU = "ur"
+
+    HINDI = "hi"
+    BENGALI = "bn"
+    TAMIL = "ta"
+    TELUGU = "te"
+    MARATHI = "mr"
+    GUJARATI = "gu"
+    KANNADA = "kn"
+    MALAYALAM = "ml"
+    PUNJABI = "pa"
+
+    CHINESE_SIMPLIFIED = "zh"
+    JAPANESE = "ja"
+    KOREAN = "ko"
+    THAI = "th"
+    VIETNAMESE = "vi"
+    INDONESIAN = "id"
+    MALAY = "ms"
+    FILIPINO = "tl"
+
+    SWEDISH = "sv"
+    NORWEGIAN = "no"
+    DANISH = "da"
+    FINNISH = "fi"
+    ICELANDIC = "is"
+
+    AFRIKAANS = "af"
+    SWAHILI = "sw"
+    ZULU = "zu"
+
+    LATIN = "la"
+
+class INDUSTRIES(str, Enum):
+    TECHNOLOGIES= "technologies"
+    HEALTHCARE="healthcare"
+    FINANCE="finance"
+    EDUCATION="education"
+    MANUFACTURING="manufacturing"
+    RETAIL="retail"
+    CONSULTING="consulting"
+    REALESTATE="real_estate"
+    AGRICULTURE = "agriculture"
+    AUTOMOTIVE = "automotive"
+    BANKING = "banking"
+    BIOTECHNOLOGY = "biotechnology"
+    CHEMICALS = "chemicals"
+    CONSTRUCTION = "construction"
+    
+    ENERGY = "energy"
+    ENTERTAINMENT = "entertainment"
+    FOOD_AND_BEVERAGE = "food & beverage"
+    GOVERNMENT = "government"
+    HOSPITALITY = "hospitality"
+    INSURANCE = "insurance"
+    IT_SERVICES = "it services"
+    LEGAL = "legal"
+    MARKETING_AND_ADVERTISING = "marketing & advertising"
+    MEDIA = "media"
+    NON_PROFIT = "non-profit"
+    PHARMACEUTICALS = "pharmaceuticals"
+    REAL_ESTATE = "real estate"
+
+    SOFTWARE = "software"
+    TELECOMMUNICATIONS = "telecommunications"
+    TRANSPORTATION = "transportation"
+    E_COMMERCE = "e-commerce"
+    OTHER = "other"
+
+class EMPLOYEE_SENIORITY(str, Enum):
+    ENTRY_LEVEL="entry_level"
+    MID_LEVEL="mid_level"
+    SENIOR_LEVEL="senior_level"
+    LEAD = "lead"
+    MANAGER="manager"
+    DIRECTOR="director"
+    VP="vp"
+    C_LEVEL = "c_level"
+    OWNER="owner"
+
+
+class FORM_INPUT_TYPE(str, Enum):
+    TEXT ="text",
+    NUMBER =   "number",
+    EMAIL =    "email",
+    PHONE =    "phone",
+    SELECT =   "select",
+    TEXTAREA =  "textarea",
+    DATE =  "date",
+    CHECKBOX =  "checkbox"
+
+
+class FORM_FIELD_MODULES(str, Enum):
+    LEAD = "lead"
+    DEAL = "deal"
+
+
+class DEAL_PIPELINE(str, Enum):
+   QUALIFICATION =  "qualification"
+   REQUIREMENT_ANALYSIS = "requirement_analysis"
+   PROPOSAL = "proposal"
+   NEGOTIATION = "negotiation"
+   WON = "won"
+   LOST = "lost"
+   CLOSED="closed"
+   DELETE = "delete"
+
+class DEAL_STAGES(str, Enum):
+    QUALIFICATION =  "qualification"
+    REQUIREMENT_ANALYSIS = "requirement_analysis"
+    PROPOSAL = "proposal"
+    NEGOTIATION = "negotiation"
+    WON = "won"
+    CLOSED_WON="closed_won"
+    LOST = "lost"
+    DELETE = "delete"
+    
+
+
+class DEAL_TYPE(str, Enum):
+    NEW_BUSINESS = "new_business"
+    EXISTING_BUSINESS = "existing_business"
+    PARTNERSHIP = "partnership"
+    OTHER = "other"
+
+class DEAL_STATUS(str, Enum):
+    ACTIVE="active"
+    INACTIVE="inactive"
+    DELETE="delete"
+    CLOSED = "closed"
+
+
+
+class FORECAST_CATEGORY(str, Enum):
+    PIPELINE = "pipeline"
+    BEST_CASE = "best_case"
+    COMMIT = "commit"
+    CLOSED = "closed"
+
+
+class EVENT_TYPE(str, Enum):
+    MEETING = "meeting"
+    TODO = "todo"
+    NOTE = "note"
+    TASK = "task"
+    REMINDER = "reminder"
+
+
+class QuotationStatus(str, Enum):
+    DRAFT = "draft"
+    SENT = "sent"
+    UPDATED = "updated"
+    RESEND = "resend"
+    VIEWED = "viewed"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    EXPIRED = "expired"
+    DELETE = "delete"
+
+class QuotationPaymentStatus(str, Enum):
+    UNPAID = "unpaid"
+    PARTIAL = "partial"
+    PAID = "paid"
+    REFUNDED = "refunded"
+ 
+ 
+class QuotationCurrency(str, Enum):
+    BLR = "BLR"
+    USD = "USD"
+    EUR = "EUR"
+    GBP = "GBP"
+    INR = "INR"
+    AED = "AED"
+    SAR = "SAR"
+    PKR = "PKR"
+    CAD = "CAD"
+    AUD = "AUD"
+    NZD = "NZD"
+    JPY = "JPY"
+    CNY = "CNY"
+    HKD = "HKD"
+    SGD = "SGD"
+    CHF = "CHF"
+    SEK = "SEK"
+    NOK = "NOK"
+    DKK = "DKK"
+    ZAR = "ZAR"
+    BRL = "BRL"
+    MXN = "MXN"
+    KRW = "KRW"
+    THB = "THB"
+    IDR = "IDR"
+    MYR = "MYR"
+    PHP = "PHP"
+    TRY = "TRY"
+    PLN = "PLN"
+    ILS = "ILS"
+    EGP = "EGP"
+    NGN = "NGN"
+    BDT = "BDT"
+    VND = "VND"
+    QAR = "QAR"
+    KWD = "KWD"
+
+class QuotationEventType(str, Enum):
+    CREATED = "created"
+    UPDATED = "updated"
+    STATUS_CHANGED = "status_changed"
+    EMAIL_SENT = "email_sent"
+    RESEND = "resend"
+    VIEWED = "viewed"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    EXPIRED = "expired"
+    DELETE = "delete"
+
+
+class INVOICE_STATUS(str, Enum):
+    DRAFT = "draft"
+    ISSUED = "issued"
+    PARTIALLY_PAID = "partially_paid"
+    PAID = "paid"
+    OVERDUE = "overdue"
+    CANCELLED = "cancelled"
+
+class NOTE_VISIBILITY(str, Enum):
+    PRIVATE = "private"   
+    TEAM = "team"        
+    PUBLIC = "public" 
+
+class NOTE_STATUS(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DELETE = "delete"
+
+class NOTES_ENTITIES(str, Enum):
+    LEAD = "lead"
+    DEAL = "deal"
+    QUOTATION = "quotation"
+    INVOICE = "invoice"
+    GENERAL = "general"
+    CAMPAIGN = "campaign"
+
+
+class ACTIVITY_ENTITY_TYPE(str, Enum):
+    ENQUIRY = "enquiry"
+    LEAD = "lead"
+    DEAL = "deal"
+    QUOTATION = "quotation"
+    INVOICE = "invoice"
+    USER = "user"
+    AUTH = "auth"
+    EVENT= "event"
+    TASK="task"
+    TASK_REPORT="task_report"
+    PLAN="plan"
+    COMPANY = "company"
+    OTP = "otp"
+    CAMPAIGN = "campaign"
+    
+    
+
+class ACTIVITY_ACTION(str, Enum):
+    CREATED = "created"
+    UPDATED = "updated"
+    SENT = "sent"
+    RESEND="resend"
+    CONVERTED = "converted"
+    CLOSED_WON = "closed_won"
+    CLOSED_LOST = "closed_lost"
+    DELETE = "delete"
+    ASSIGN = "assign"
+    REASSIGN = "reassign"
+
+    LOGIN = "login"            
+    LOGOUT = "logout"          
+    LOGIN_FAILED = "login_failed"  
+    CALL_MADE = "call_made"
+    CALL_RECEIVED = "call_received"
+    UPDATE_LEAD_CONNECTION_STATUS = "update_lead_connection_status"
+
+    EMAIL_SENT = "email_sent"
+    EMAIL_OPENED = "email_opened"
+
+    SMS_SENT = "sms_sent"
+    SMS_DELIVERED = "sms_delivered"
+
+    RESTORE = "restore"
+    VERIFY = "verify"
+    REGISTER = "register"
+
+    FORGOT_PASSWORD = "forgot_password"
+
+
+class LEAD_SOURCE_TYPE(str, Enum):
+    SELF_CREATED = "self_created"
+    ADMIN_CREATED = "admin_created"
+    MANAGER_CREATED = "manager_created"
+    BULK_IMPORTED = "bulk_imported"
+
+
+class NUMBER_OF_EMPLOYEES(str, Enum):
+    # Existing company settings records use these smaller ranges.
+    EMPLOYEES_1_10 = "1-10"
+    EMPLOYEES_11_50 = "11-50"
+    EMPLOYEES_51_200 = "51-200"
+    EMPLOYEES_201_500 = "201-500"
+    EMPLOYEES_501_1000 = "501-1000"
+    EMPLOYEES_1000_PLUS = "1000+"
+    LESS_THAN_50 = "50"
+    FROM_50_TO_100 = "50-100"
+    FROM_100_TO_200 = "100-200"
+    FROM_200_TO_300 = "200-300"
+    FROM_300_TO_400 = "300-400"
+    FROM_400_TO_500 = "400-500"
+    FROM_500_TO_1000 = "500-1000"
+    FROM_1000_TO_2000 = "1000-2000"
+    FROM_2000_TO_5000 = "2000-5000"
+
+class DESIGNATION(str, Enum):
+    
+    CEO = "CEO"
+    CTO = "CTO"
+    CFO = "CFO"
+    COO = "COO"
+    CMO = "CMO"
+    CIO = "CIO"
+    FOUNDER = "Founder"
+    CO_FOUNDER = "Co-Founder"
+    DIRECTOR = "Director"
+    VP = "Vice President"
+
+    # Management
+    GENERAL_MANAGER = "General Manager"
+    OPERATIONS_MANAGER = "Operations Manager"
+    SALES_MANAGER = "Sales Manager"
+    MARKETING_MANAGER = "Marketing Manager"
+    HR_MANAGER = "HR Manager"
+    PROJECT_MANAGER = "Project Manager"
+    PRODUCT_MANAGER = "Product Manager"
+    ACCOUNT_MANAGER = "Account Manager"
+
+    # Technical
+    SOFTWARE_ENGINEER = "Software Engineer"
+    SENIOR_SOFTWARE_ENGINEER = "Senior Software Engineer"
+    TECH_LEAD = "Tech Lead"
+    ARCHITECT = "Architect"
+    DEVOPS_ENGINEER = "DevOps Engineer"
+    DATA_SCIENTIST = "Data Scientist"
+    QA_ENGINEER = "QA Engineer"
+
+    # Sales & Marketing
+    SALES_EXECUTIVE = "Sales Executive"
+    BUSINESS_DEVELOPMENT_EXECUTIVE = "Business Development Executive"
+    MARKETING_EXECUTIVE = "Marketing Executive"
+
+    # Support & Others
+    HR_EXECUTIVE = "HR Executive"
+    ADMINISTRATOR = "Administrator"
+    CONSULTANT = "Consultant"
+    INTERN = "Intern"
+    OTHER = "Other"
+
+
+class INFO_TYPE(str, Enum):
+    PEOPLE = "people"
+    COMPANY = "company"
+
+
+
+class TECHNOLOGY(str, Enum):
+    REACT = "react"
+    ANGULAR = "angular"
+    VUE = "vue"
+    NEXT_JS = "next_js"
+    HTML = "html"
+    CSS = "css"
+    JAVASCRIPT = "javascript"
+    TYPESCRIPT = "typescript"
+
+    
+    NODE_JS = "node_js"
+    EXPRESS = "express"
+    DJANGO = "django"
+    FLASK = "flask"
+    FASTAPI = "fastapi"
+    LARAVEL = "laravel"
+    SPRING_BOOT = "spring_boot"
+    DOT_NET = "dot_net"
+    RUBY_ON_RAILS = "ruby_on_rails"
+    PHP = "php"
+
+    
+    MONGODB = "mongodb"
+    MYSQL = "mysql"
+    POSTGRESQL = "postgresql"
+    SQLITE = "sqlite"
+    REDIS = "redis"
+    ELASTICSEARCH = "elasticsearch"
+
+    
+    AWS = "aws"
+    AZURE = "azure"
+    GOOGLE_CLOUD = "google_cloud"
+    DOCKER = "docker"
+    KUBERNETES = "kubernetes"
+    NGINX = "nginx"
+    VERCEL = "vercel"
+    NETLIFY = "netlify"
+
+    
+    WORDPRESS = "wordpress"
+    SHOPIFY = "shopify"
+    MAGENTO = "magento"
+    WEBFLOW = "webflow"
+    WIX = "wix"
+    SQUARESPACE = "squarespace"
+
+    
+    HUBSPOT = "hubspot"
+    SALESFORCE = "salesforce"
+    ZOHO_CRM = "zoho_crm"
+    PIPEDRIVE = "pipedrive"
+    FRESHSALES = "freshsales"
+    MICROSOFT_DYNAMICS = "microsoft_dynamics"
+
+   
+    MAILCHIMP = "mailchimp"
+    ACTIVE_CAMPAIGN = "active_campaign"
+    MARKETO = "marketo"
+    KLAVIYO = "klaviyo"
+
+    
+    GOOGLE_ANALYTICS = "google_analytics"
+    HOTJAR = "hotjar"
+    MIXPANEL = "mixpanel"
+
+    
+    STRIPE = "stripe"
+    PAYPAL = "paypal"
+    RAZORPAY = "razorpay"
+
+    
+    ANDROID = "android"
+    IOS = "ios"
+    REACT_NATIVE = "react_native"
+    FLUTTER = "flutter"
+
+   
+    PYTHON = "python"
+    TENSORFLOW = "tensorflow"
+    PYTORCH = "pytorch"
+    PANDAS = "pandas"
+    NUMPY = "numpy"
+
+
+class PHONE_NUMBER_STATUS(str, Enum):
+    ACTIVE= "active",
+    INACTIVE="inactive",
+    DELETED="deleted"
+
+
+
+
+class MESSAGE_DIRECTION(str, Enum):
+    OUTBOUND = "outbound"      
+    INBOUND = "inbound"        
+
+class MESSAGE_STATUS(str, Enum):
+    QUEUED = "queued"
+    SENT = "sent"
+    DELIVERED = "delivered"
+    FAILED = "failed"
+    UNDELIVERED = "undelivered"
+    RECEIVED = "received"
+    READ = "read"
+
+class MESSAGE_CHANNEL(str, Enum):
+    TWILIO = "twilio"
+    MSG91 = "msg91"
+    FAST2SMS = "fast2sms"
+
+class TemplateStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DRAFT = "draft"
+    ARCHIVED = "archived"
+
+
+class TemplateCategory(str, Enum):
+    MARKETING = "marketing"
+    TRANSACTIONAL = "transactional"
+    FOLLOW_UP = "follow_up"
+    WELCOME = "welcome"
+    INVOICE = "invoice"
+    QUOTATION = "quotation"
+    LEAD = "lead"
+    DEAL = "deal"
+    CUSTOM = "custom"
+
+
+class TemplateVariable(BaseModel):
+    
+    key: str                        
+    label: str                      
+    description: Optional[str]      
+    default_value: Optional[str]    
+    is_required: bool = False
+
+
+class EmailStatus(str, Enum):
+    QUEUED = "queued"
+    SENT = "sent"
+    DELIVERED = "delivered"
+    OPENED = "opened"
+    CLICKED = "clicked"
+    FAILED = "failed"
+    BOUNCED = "bounced"
+    SPAM = "spam"
+
+
+class CONTACT_STATUS(str, Enum):
+    CONNECTED = "connected"
+    NOT_CONNECTED = "not_connected"
+    INTERESTED= "interested"
+    NOT_INTERESTED = "not_interested"
+    NOT_REACHED = "not_reached"
+    call_back = "call_back"
+    wrong_number = "wrong_number"
+    meeting_scheduled = "meeting_scheduled"
+    meeting_completed = "meeting_completed"
+    follow_up = "follow_up"
+
+
+class TASK_PRIORITY(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+class TASK_STATUS_TYPE(str, Enum):
+    NOT_STARTED = "not_started"    
+    ACTIVE = "active"             
+    COMPLETED = "completed"       
+    CANCELLED = "cancelled"        
+
+class TASK_ENTITY_TYPE(str, Enum):
+    PROJECT = "project"
+    LEAD = "lead"
+    DEAL = "deal"
+    ENQUIRY = "enquiry"
+    CONTACT = "contact"
+    GENERAL = "general"
+
+
+class CATEGORY_VISIBILITY(str, Enum):
+    GLOBAL = "global"             
+    TEAM = "team"                 
+    PERSONAL = "personal"          
+
+
+class RECURRENCE_TYPE(str, Enum):
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+
+
+class TASK_ACTIVITY_ACTION(str, Enum):
+    CREATED = "created"
+    CREATE_SUB_TASK = "create_sub_task"
+    STATUS_CHANGED = "status_changed"
+    ASSIGNED = "assigned"
+    REASSIGNED = "reassigned"
+    PRIORITY_CHANGED = "priority_changed"
+    DUE_DATE_CHANGED = "due_date_changed"
+    COMMENTED = "commented"
+    ATTACHMENT_ADDED = "attachment_added"
+    COMPLETED = "completed"
+    REOPENED = "reopened"
+    DELETED = "deleted"
+    DELETE_REMARK = "delete_remark"
+    UPDATE = "update"
+    REMARK_CREATED="remark_created"
+    REMARK_ACKNOWLEDGED = "remark_acknowledged"
+    RECURRING_CREATED = "recurring_created"
+    COMPLETE_SUB_TASK = "complete_sub_task"
+    UNCOMPLETE_SUB_TASK = "uncomplete_sub_task"
+    DELETE_SUBTASK = "delete_subtask"
+    TIMER_STARTED = "timer_started"
+    TIMER_PAUSED = "timer_paused"
+    TIMER_RESUMED = "timer_resumed"
+    TIMER_STOPPED = "timer_stopped"
+
+
+class LEAD_REQUEST_STATUS(str, Enum):
+    PENDING = "pending"
+
+
+class TASK_ITEM_STATUS(str, Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    BLOCKED = "blocked"
+    CARRIED_FORWARD = "carried_forward"
+
+
+class TASK_REPORT_STATUS(str, Enum):
+    MORNING_PENDING = "morning_pending"
+    EVENING_PENDING = "evening_pending"
+    COMPLETED_PENDING_REVIEW = "completed_pending_review"
+    SUBMITTED="submitted"
+    REVIEWED = "reviewed"
+    MISSED = "missed"
+
+
+class WORK_MOOD(str, Enum):
+    EXCELLENT = "excellent"
+    GOOD = "good"
+    NEUTRAL = "neutral"
+    TIRED = "tired"
+    STRESSED = "stressed"
+
+
+
+class TIMELOG_STATUS(str, Enum):
+    RUNNING = "running"
+    PAUSED = "paused"
+    STOPPED = "stopped"
+
+
+class COMPANY_STATUS(str, Enum):
+    ACTIVE = "active"
+    PENDING_VERIFICATION = "pending_verification"
+    SUSPENDED = "suspended"
+    INACTIVE = "inactive"
+    DELETED = "deleted"
+
+
+class PLAN_STATUS(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DELETED = "deleted"
+
+
+class FEATURE_STATUS(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DELETED = "deleted"
+
+
+class PLAN_VISIBILITY(str, Enum):
+    PRIVATE= "private"
+    PUBLIC = "public"
+
+
+class SUBSCRIPTION_STATUS(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    PAUSED = "pause"
+    COMPLETED = "completed"
+    TRIAL = "trial"
+    CANCELED = "canceled"
+
+
+class CURRENCY(str, Enum):
+    USD = "USD"  # US Dollar
+    EUR = "EUR"  # Euro
+    GBP = "GBP"  # British Pound
+    INR = "INR"  # Indian Rupee
+    AUD = "AUD"  # Australian Dollar
+    CAD = "CAD"  # Canadian Dollar
+    CHF = "CHF"  # Swiss Franc
+    CNY = "CNY"  # Chinese Yuan
+    JPY = "JPY"  # Japanese Yen
+    SGD = "SGD"  # Singapore Dollar
+    HKD = "HKD"  # Hong Kong Dollar
+    NZD = "NZD"  # New Zealand Dollar
+    SEK = "SEK"  # Swedish Krona
+    NOK = "NOK"  # Norwegian Krone
+    DKK = "DKK"  # Danish Krone
+    ZAR = "ZAR"  # South African Rand
+    AED = "AED"  # UAE Dirham
+    SAR = "SAR"  # Saudi Riyal
+    BRL = "BRL"  # Brazilian Real
+    MXN = "MXN"  # Mexican Peso
+    RUB = "RUB"  # Russian Ruble
+    KRW = "KRW"  # South Korean Won
+
+
+class DISCOUNT_TYPE(str, Enum):
+    AMOUNT = "amount",
+    PERCENTAGE = "percentage"
+
+
+class REGISTRATION_SOURCE(str, Enum):
+    ADMIN_CREATED = "admin_created"      
+    SELF_REGISTERED = "self_registered"
+
+
+class BILLING_CYCLE(str, Enum):
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+
+
+class FEATURE(str, Enum):
+    TASK = "task:feature",
+    CRM = "crm:feature",
+    TELECOM = "telecom:feature",
+    CHAT = "chat:feature",
+    CALENDER = "calender:feature",
+    NOTE = "notes:feature"
+
+
+class PAYMENT_STATUS(str, Enum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+    REFUNDED = "REFUNDED"
+    PARTIALLY_REFUNDED = "PARTIALLY_REFUNDED"
+
+class PAYMENT_METHOD(str, Enum):
+    PAYPAL = "PAYPAL"
+    STRIPE = "STRIPE"  # for future
+    CARD = "CARD"      # for future
+
+class BILLING_CYCLE(str, Enum):
+    MONTHLY = "monthly"
+    YEARLY = "yearly"
+
+
+
+class DATE_FILTER(str, Enum):
+    ALL = "all"
+    TODAY = "today"
+    WEEK = "week"
+    MONTH = "month"
+    YEAR = "year"
+    CUSTOM = "custom"
+
+
+class RATING_FILTER(str, Enum):
+    ALL = "all"
+    RATED = "rated"
+    UNRATED = "unrated"
+    ONE = "1"
+    TWO = "2"
+    THREE = "3"
+    FOUR = "4"
+    FIVE = "5"
+
+
+class ON_TIME_FILTER(str, Enum):
+    ALL = "all"
+    ON_TIME = "onTime"
+    OVERDUE = "overdue"
+
+
+# ─── Campaign ─────────────────────────────────────────────────────────────────
+
+class CAMPAIGN_DISTRIBUTION_MODE(str, Enum):
+    ON_DEMAND = "on_demand"
+    EQUAL = "equal"
+    CONDITIONAL = "conditional"
+
+
+class CAMPAIGN_STATUS(str, Enum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
+    ARCHIVED = "archived"
+    DELETED = "deleted"
+
+
+    @classmethod
+    def _missing_(cls, value):
+        # Accept older clients and stored records without exposing Draft again.
+        if value == "draft":
+            return cls.ACTIVE
+        return None
+
+
+class CAMPAIGN_LEAD_STATUS(str, Enum):
+    UNASSIGNED = "unassigned"
+    ASSIGNED = "assigned"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    SKIPPED = "skipped"

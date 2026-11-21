@@ -1,0 +1,1332 @@
+import { ColorOption } from "@/src/types/task/status.types";
+
+export enum PROJECT_TYPES {
+  // Core Development
+  MOBILE_APP = "mobile_app",
+  WEBSITE = "website",
+  WEB_APP = "web_app",
+  CRM = "crm",
+  ERP = "erp",
+  CUSTOM_SOFTWARE = "custom_software",
+
+  // Emerging Tech
+  AI_ML = "ai_ml",
+  DATA_SCIENCE = "data_science",
+  BLOCKCHAIN = "blockchain",
+  IOT = "iot",
+
+  UI_UX_DESIGN = "ui_ux_design",
+  GRAPHIC_DESIGN = "graphic_design",
+  BRANDING = "branding",
+
+
+  DIGITAL_MARKETING = "digital_marketing",
+  SEO = "seo",
+  SOCIAL_MEDIA_MARKETING = "social_media_marketing",
+  CONTENT_MARKETING = "content_marketing",
+
+  // Testing & Support
+  TESTING = "testing",
+  QA_AUTOMATION = "qa_automation",
+  MAINTENANCE_SUPPORT = "maintenance_support",
+
+  // Infrastructure
+  CLOUD_SERVICES = "cloud_services",
+  DEVOPS = "devops",
+  CYBER_SECURITY = "cyber_security",
+
+  // E-commerce & CMS
+  ECOMMERCE = "ecommerce",
+  CMS = "cms",
+
+  // Consulting
+  IT_CONSULTING = "it_consulting",
+  PRODUCT_CONSULTING = "product_consulting",
+  OTHER = "other"
+}
+
+
+export enum SALES_STATUS {
+  NEW = "new",
+  CONTACTED = "contacted",
+  QUALIFIED = "qualified",
+  PROPOSAL = "proposal",
+  WON = "won",
+  LOST = "lost",
+  DELETE = "delete"
+}
+
+
+export enum PRIORITY {
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+}
+
+
+export enum SOURCE {
+  // Online / Digital
+  WEBSITE = "website",
+  CHATBOT = "chatbot",
+  EMAIL = "email",
+  NEWSLETTER = "newsletter",
+
+  // Direct Sales
+  CALL = "call",
+  WHATSAPP = "whatsapp",
+  SMS = "sms",
+  WALK_IN = "walk_in",
+
+  // Ads & Marketing
+  AD = "ad",
+  GOOGLE_ADS = "google_ads",
+  FACEBOOK_ADS = "facebook_ads",
+  LINKEDIN_ADS = "linkedin_ads",
+  INSTAGRAM_ADS = "instagram_ads",
+
+  // Referrals & Partners
+  REFERRAL = "referral",
+  PARTNER = "partner",
+  AFFILIATE = "affiliate",
+  RESELLER = "reseller",
+
+  // Outreach
+  COLD_CALL = "cold_call",
+  COLD_EMAIL = "cold_email",
+  LINKEDIN_OUTREACH = "linkedin_outreach",
+
+  // Marketplaces
+  UPWORK = "upwork",
+  FIVERR = "fiverr",
+  FREELANCER = "freelancer",
+  TOPTAL = "toptal",
+
+  EVENT = "event",
+  CONFERENCE = "conference",
+  MEETUP = "meetup",
+  EXHIBITION = "exhibition",
+
+  // Other
+  OTHER = "other",
+}
+
+export enum TASK_REPORT_STATUS{
+  MORNING_PENDING = "morning_pending",
+    EVENING_PENDING = "evening_pending",
+    COMPLETED_PENDING_REVIEW = "completed_pending_review",
+    SUBMITTED="submitted",
+    REVIEWED = "reviewed",
+    MISSED= "missed",
+    NOT_SUBMIT = "not_submit"
+}
+
+export enum PERMISSIONS {
+  createUser = "user:create",
+  readUser = "user:read",
+  updateUser = "user:update",
+  deleteUser = "user:delete",
+  deletedUserView = "user:readDeleted",
+  createRole = "role:create",
+  readRole = "role:read",
+  updateRole = "role:update",
+  deleteRole = "role:delete",
+  createEnquiry = "enquiry:create",
+  readEnquiry = "enquiry:read",
+  updateEnquiry = "enquiry:update",
+  deleteEnquiry = "enquiry:delete",
+  assignEnquiry = "enquiry:assign",
+  createLead = "lead:create",
+  readLead = "lead:read",
+  viewAssignLeadInformation = "lead:assignView",
+  updateLead = "lead:update",
+  assignLead = "lead:assign",
+  reassignLead = "lead:reassign",
+  deleteLead = "lead:delete",
+  createTeam = "team:create",
+  readTeam = "team:read",
+  updateTeam = "team:update",
+  deleteTeam = "team:delete",
+  createTeamCategory = "team_cat:create",
+  readTeamCategory = "team_cat:read",
+  updateTeamCategory = "team_cat:update",
+  deleteTeamCategory = "team_cat:delete",
+  createDeal = "deal:create",
+  readDeal = "deal:read",
+  updateDeal = "deal:update",
+  deleteDeal = "deal:delete",
+  createQuote = "quote:create",
+  readQuote = "quote:read",
+  updateQuote = "quote:update",
+  quoteDelete = "quote:delete",
+  readInvoice = "invoice:read",
+  createInvoice = "invoice:create",
+  updateInvoice = "invoice:update",
+  deleteInvoice = "invoice:delete",
+  sendInvoice = "invoice:send",
+  downloadInvoice = "invoice:download",
+  markPaidInvoice = "invoice:mark-paid",
+  cancelInvoice = "invoice:cancel",
+  createEvent = "event:create",
+  readEvent = "event:read",
+  updateEvent = "event:update",
+  deleteEvent = "event:delete",
+  readNote = "note:read",
+  readProspects = "prospect:read",
+  createProspects = "prospect:create",
+  deleteProspects = "prospect:delete",
+  updateProspects = "prospect:update",
+  viewAssignProspectInformation = "prospect:assignView",
+  callProspects = "call:call",
+  emailProspects = "email:send",
+  smsProspects = "sms:send",
+  createTemplate = "emailTemplate:create",
+  readTemplate = "emailTemplate:read",
+  updateTemplate = "emailTemplate:update",
+  deleteTemplate = "emailTemplate:delete",
+  readEmailLog = "email:read",
+  telephone = "telephone:read",
+  telephoneCreate = "telephone:create",
+  telephoneUpdate = "telephone:update",
+  telephoneDelete = "telephone:delete",
+  telephoneAssign = "telephone:assign",
+  smsReadLog = "sms:read",
+  smsViewLog = "sms:viewlog",
+  readClient = "client:read",
+  createTask = "task:create",
+  readTask = "task:read",
+  updateTask = "task:update",
+  deleteTask = "task:delete",
+  assignTask = "task:assign",
+  taskStatusChange = "task:statusChange",
+  taskCategoryCreate = "taskCategory:create",
+  taskCategoryRead = "taskCategory:read",
+  taskCategoryUpdate = "taskCategory:update",
+  taskCategoryDelete = "taskCategory:delete",
+  taskStatusCreate = "taskStatus:create",
+  taskStatusRead = "taskStatus:read",
+  taskStatusUpdate = "taskStatus:update",
+  taskStatusDelete = "taskStatus:delete",
+  readOTP = "readOTP:read",
+  readSalesDashbord = "salesDashboard:read",
+  markFinal = "task:markStatusComplete",
+  readRemark = "remark:read",
+  createRemark = "remark:create",
+  updateRemark= "remark:update",
+  deleteRemark= "remark:delete",
+  taskReportRead = "taskReport:read",
+  addTodayReport = "taskReport:addToday",
+  createTaskReport = "taskReport:create",
+  readTaskReport = "taskReport:read",
+  updateTaskReport = "taskReport:update",
+  deleteTaskReport = "taskReport:delete",
+  taskTimerRead= "task_timer:read",
+  taskTimerStart= "task_timer:start",
+  taskTimerPause= "task_timer:pause",
+  taskTimerResume= "task_timer:resume",
+  taskTimerStop= "task_timer:stop",
+  taskTimerDelete= "task_timer:delete",
+  readCampaign = "campaign:read",
+  createCampaign = "campaign:create",
+  updateCampaign = "campaign:update",
+  deleteCampaign = "campaign:delete",
+  manageCampaign = "campaign:manage",
+}
+
+
+export enum COUNTRY_CODE {
+  AFGHANISTAN = "AF",
+  ALAND_ISLANDS = "AX",
+  ALBANIA = "AL",
+  ALGERIA = "DZ",
+  AMERICAN_SAMOA = "AS",
+  ANDORRA = "AD",
+  ANGOLA = "AO",
+  ANGUILLA = "AI",
+  ANTARCTICA = "AQ",
+  ANTIGUA_AND_BARBUDA = "AG",
+  ARGENTINA = "AR",
+  ARMENIA = "AM",
+  ARUBA = "AW",
+  AUSTRALIA = "AU",
+  AUSTRIA = "AT",
+  AZERBAIJAN = "AZ",
+  BAHAMAS = "BS",
+  BAHRAIN = "BH",
+  BANGLADESH = "BD",
+  BARBADOS = "BB",
+  BELARUS = "BY",
+  BELGIUM = "BE",
+  BELIZE = "BZ",
+  BENIN = "BJ",
+  BERMUDA = "BM",
+  BHUTAN = "BT",
+  BOLIVIA = "BO",
+  BOSNIA_AND_HERZEGOVINA = "BA",
+  BOTSWANA = "BW",
+  BRAZIL = "BR",
+  BRUNEI = "BN",
+  BULGARIA = "BG",
+  BURKINA_FASO = "BF",
+  BURUNDI = "BI",
+  CAMBODIA = "KH",
+  CAMEROON = "CM",
+  CANADA = "CA",
+  CAPE_VERDE = "CV",
+  CAYMAN_ISLANDS = "KY",
+  CENTRAL_AFRICAN_REPUBLIC = "CF",
+  CHAD = "TD",
+  CHILE = "CL",
+  CHINA = "CN",
+  COLOMBIA = "CO",
+  COMOROS = "KM",
+  CONGO = "CG",
+  COSTA_RICA = "CR",
+  CROATIA = "HR",
+  CUBA = "CU",
+  CYPRUS = "CY",
+  CZECH_REPUBLIC = "CZ",
+  DENMARK = "DK",
+  DJIBOUTI = "DJ",
+  DOMINICA = "DM",
+  DOMINICAN_REPUBLIC = "DO",
+  ECUADOR = "EC",
+  EGYPT = "EG",
+  EL_SALVADOR = "SV",
+  ESTONIA = "EE",
+  ETHIOPIA = "ET",
+  FINLAND = "FI",
+  FRANCE = "FR",
+  GABON = "GA",
+  GEORGIA = "GE",
+  GERMANY = "DE",
+  GHANA = "GH",
+  GREECE = "GR",
+  GREENLAND = "GL",
+  GRENADA = "GD",
+  GUATEMALA = "GT",
+  GUINEA = "GN",
+  GUYANA = "GY",
+  HAITI = "HT",
+  HONDURAS = "HN",
+  HONG_KONG = "HK",
+  HUNGARY = "HU",
+  ICELAND = "IS",
+  INDIA = "IN",
+  INDONESIA = "ID",
+  IRAN = "IR",
+  IRAQ = "IQ",
+  IRELAND = "IE",
+  ISRAEL = "IL",
+  ITALY = "IT",
+  JAMAICA = "JM",
+  JAPAN = "JP",
+  JORDAN = "JO",
+  KAZAKHSTAN = "KZ",
+  KENYA = "KE",
+  KUWAIT = "KW",
+  LATVIA = "LV",
+  LEBANON = "LB",
+  LITHUANIA = "LT",
+  LUXEMBOURG = "LU",
+  MALAYSIA = "MY",
+  MALDIVES = "MV",
+  MEXICO = "MX",
+  MOLDOVA = "MD",
+  MONACO = "MC",
+  MONGOLIA = "MN",
+  MOROCCO = "MA",
+  MYANMAR = "MM",
+  NEPAL = "NP",
+  NETHERLANDS = "NL",
+  NEW_ZEALAND = "NZ",
+  NIGERIA = "NG",
+  NORTH_KOREA = "KP",
+  NORWAY = "NO",
+  OMAN = "OM",
+  PAKISTAN = "PK",
+  PANAMA = "PA",
+  PERU = "PE",
+  PHILIPPINES = "PH",
+  POLAND = "PL",
+  PORTUGAL = "PT",
+  QATAR = "QA",
+  ROMANIA = "RO",
+  RUSSIA = "RU",
+  SAUDI_ARABIA = "SA",
+  SINGAPORE = "SG",
+  SLOVAKIA = "SK",
+  SLOVENIA = "SI",
+  SOUTH_AFRICA = "ZA",
+  SOUTH_KOREA = "KR",
+  SPAIN = "ES",
+  SRI_LANKA = "LK",
+  SWEDEN = "SE",
+  SWITZERLAND = "CH",
+  TAIWAN = "TW",
+  THAILAND = "TH",
+  TURKEY = "TR",
+  UKRAINE = "UA",
+  UNITED_ARAB_EMIRATES = "AE",
+  UNITED_KINGDOM = "GB",
+  UNITED_STATES = "US",
+  URUGUAY = "UY",
+  UZBEKISTAN = "UZ",
+  VIETNAM = "VN",
+  YEMEN = "YE",
+  ZAMBIA = "ZM",
+  ZIMBABWE = "ZW"
+}
+
+
+export enum LANGUAGE_CODE {
+  ENGLISH = "en",
+  SPANISH = "es",
+  FRENCH = "fr",
+  GERMAN = "de",
+  ITALIAN = "it",
+  PORTUGUESE = "pt",
+  DUTCH = "nl",
+  RUSSIAN = "ru",
+  UKRAINIAN = "uk",
+  POLISH = "pl",
+  CZECH = "cs",
+  SLOVAK = "sk",
+  HUNGARIAN = "hu",
+  ROMANIAN = "ro",
+  BULGARIAN = "bg",
+  GREEK = "el",
+  TURKISH = "tr",
+
+  ARABIC = "ar",
+  HEBREW = "he",
+  PERSIAN = "fa",
+  URDU = "ur",
+
+  HINDI = "hi",
+  BENGALI = "bn",
+  TAMIL = "ta",
+  TELUGU = "te",
+  MARATHI = "mr",
+  GUJARATI = "gu",
+  KANNADA = "kn",
+  MALAYALAM = "ml",
+  PUNJABI = "pa",
+
+  CHINESE = "zh",
+  JAPANESE = "ja",
+  KOREAN = "ko",
+  THAI = "th",
+  VIETNAMESE = "vi",
+  INDONESIAN = "id",
+  MALAY = "ms",
+  FILIPINO = "tl",
+
+  SWEDISH = "sv",
+  NORWEGIAN = "no",
+  DANISH = "da",
+  FINNISH = "fi",
+  ICELANDIC = "is",
+
+  AFRIKAANS = "af",
+  SWAHILI = "sw",
+  ZULU = "zu",
+
+  LATIN = "la"
+}
+
+
+export enum EMPLOYEE_SENIORITY {
+  ENTRY_LEVEL = "entry_level",
+  MID_LEVEL = "mid_level",
+  SENIOR_LEVEL = "senior_level",
+  LEAD = "lead",
+  MANAGER = "manager",
+  DIRECTOR = "director",
+  VP = "vp",
+  C_LEVEL = "c_level",
+  OWNER = "owner"
+}
+
+export enum INDUSTRIES {
+  TECHNOLOGIES = "technologies",
+  HEALTHCARE = "healthcare",
+  FINANCE = "finance",
+  EDUCATION = "education",
+  MANUFACTURING = "manufacturing",
+  RETAIL = "retail",
+  CONSULTING = "consulting",
+  REALESTATE = "real_estate",
+  AGRICULTURE = "Agriculture",
+  AUTOMOTIVE = "Automotive",
+  BANKING = "Banking",
+  BIOTECHNOLOGY = "Biotechnology",
+  CHEMICALS = "Chemicals",
+  CONSTRUCTION = "Construction",
+
+  ENERGY = "Energy",
+  ENTERTAINMENT = "Entertainment",
+  FOOD_AND_BEVERAGE = "Food & Beverage",
+  GOVERNMENT = "Government",
+  HOSPITALITY = "Hospitality",
+  INSURANCE = "Insurance",
+  IT_SERVICES = "IT Services",
+  LEGAL = "Legal",
+  MARKETING_AND_ADVERTISING = "Marketing & Advertising",
+  MEDIA = "Media",
+  NON_PROFIT = "Non-Profit",
+  PHARMACEUTICALS = "Pharmaceuticals",
+  REAL_ESTATE = "Real Estate",
+
+  SOFTWARE = "Software",
+  TELECOMMUNICATIONS = "Telecommunications",
+  TRANSPORTATION = "Transportation",
+  E_COMMERCE = "E-Commerce",
+  OTHER = "Other"
+}
+
+export enum FORM_FIELD_MODULE {
+  LEAD = "lead",
+  DEAL = "deal"
+}
+
+export enum DEAL_PIPELINE {
+  QUALIFICATION = "qualification",
+  REQUIREMENT_ANALYSIS = "requirement_analysis",
+  PROPOSAL = "proposal",
+  NEGOTIATION = "negotiation",
+  WON = "won",
+  LOST = "lost",
+  CLOSED="closed"
+}
+
+
+export enum DEAL_STAGES {
+  QUALIFICATION = "qualification",
+  REQUIREMENT_ANALYSIS = "requirement_analysis",
+  PROPOSAL = "proposal",
+  NEGOTIATION = "negotiation",
+  WON = "won",
+  LOST = "lost",
+  DELETE = "delete",
+  CLOSED_WON = "closed_won"
+}
+
+
+export enum DEAL_TYPE {
+  NEW_BUSINESS = "new_business",
+  EXISTING_BUSINESS = "existing_business",
+  PARTNERSHIP = "partnership",
+  OTHER = "other",
+}
+
+export enum QuotationPaymentStatus {
+  UNPAID = "unpaid",
+  PARTIAL = "partial",
+  PAID = "paid",
+  REFUNDED = "refunded",
+}
+
+export enum QuotationCurrency {
+  BLR = "BLR",
+  USD = "USD",
+  EUR = "EUR",
+  GBP = "GBP",
+  INR = "INR",
+  AED = "AED",
+  SAR = "SAR",
+  PKR = "PKR",
+  CAD = "CAD",
+  AUD = "AUD",
+  NZD = "NZD",
+  JPY = "JPY",
+  CNY = "CNY",
+  HKD = "HKD",
+  SGD = "SGD",
+  CHF = "CHF",
+  SEK = "SEK",
+  NOK = "NOK",
+  DKK = "DKK",
+  ZAR = "ZAR",
+  BRL = "BRL",
+  MXN = "MXN",
+  KRW = "KRW",
+  THB = "THB",
+  IDR = "IDR",
+  MYR = "MYR",
+  PHP = "PHP",
+  TRY = "TRY",
+  PLN = "PLN",
+  ILS = "ILS",
+  EGP = "EGP",
+  NGN = "NGN",
+  BDT = "BDT",
+  VND = "VND",
+  QAR = "QAR",
+  KWD = "KWD",
+}
+
+export enum DEAL_STATUS {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  DELETE = "delete"
+}
+
+export enum FORECAST_CATEGORY {
+  PIPELINE = "pipeline",
+  BEST_CASE = "best_case",
+  COMMIT = "commit",
+  CLOSED = "closed",
+}
+
+
+export enum QuotationStatus {
+  DRAFT = "draft",
+  SENT = "sent",
+  UPDATED = "updated",
+  RESEND = "resend",
+  VIEWED = "viewed",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  EXPIRED = "expired",
+  DELETE = "delete"
+}
+
+export enum QUOTATION_EVENT_TYPE {
+  CREATED = "created",
+  UPDATED = "updated",
+  STATUS_CHANGED = "status_changed",
+  EMAIL_SENT = "email_sent",
+  RESEND = "resend",
+  VIEWED = "viewed",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  EXPIRED = "expired",
+  DELETE = "delete",
+}
+
+
+export enum EventType {
+  MEETING = "meeting",
+  TODO = "todo",
+  NOTE = "note",
+  TASK = "task",
+  REMINDER = "reminder"
+}
+
+export enum INVOICE_STATUS {
+  DRAFT = "DRAFT",
+  ISSUED = "ISSUED",
+  SENT = "SENT",
+  PAID = "PAID",
+  PARTIALLY_PAID = "PARTIALLY_PAID",
+  OVERDUE = "OVERDUE",
+  CANCELLED = "CANCELLED",
+}
+
+export enum NoteVisibility {
+  PRIVATE = "private",
+  TEAM = "team",
+  PUBLIC = "public",
+}
+
+export enum NoteStatus {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  DELETED = "deleted",
+}
+
+export enum NotesEntities {
+  LEAD = "lead",
+  DEAL = "deal",
+  QUOTATION = "quotation",
+  INVOICE = "invoice",
+  GENERAL = "general",
+}
+
+export enum CUSTOM_FIELD_TYPE {
+  TEXT = "text",
+  NUMBER = "number",
+  EMAIL = "email",
+  PHONE = "phone",
+  SELECT = "select",
+  TEXTAREA = "textarea",
+  DATE = "date",
+  CHECKBOX = "checkbox",
+}
+
+
+export enum ACTIVITY_ENTITY_TYPE {
+  ENQUIRY = "enquiry",
+    LEAD = "lead",
+    DEAL = "deal",
+    QUOTATION = "quotation",
+    INVOICE = "invoice",
+    USER = "user",
+    AUTH = "auth",
+    EVENT= "event",
+    TASK="task",
+    TASK_REPORT="task_report",
+    PLAN="plan",
+    COMPANY = "company",
+    OTP = "otp",
+}
+
+export enum ACTIVITY_ACTION {
+  CREATED = "created",
+  UPDATED = "updated",
+  SENT = "sent",
+  RESEND = "resend",
+  CONVERTED = "converted",
+  CLOSED_WON = "closed_won",
+  CLOSED_LOST = "closed_lost",
+  DELETE = "delete",
+  WON = "won",
+  LOST = "lost",
+  ACCEPTED = "accepted",
+  SMS_SENT = "sms_sent",
+    SMS_DELIVERED = "sms_delivered",
+    EMAIL_SENT = "email_sent",
+    EMAIL_OPENED = "email_opened",
+
+    RESTORE = "restore",
+    VERIFY = "verify",
+    REGISTER = "register",
+}
+
+
+export enum LEAD_SOURCE_TYPE {
+  SELF_CREATED = "self_created",
+  ADMIN_CREATED = "admin_created",
+  MANAGER_CREATED = "manager_created",
+  BULK_IMPORTED = "bulk_imported",
+}
+
+
+export enum NUMBER_OF_EMPLOYEES {
+  LESS_THAN_50 = "50",
+  FROM_50_TO_100 = "50-100",
+  FROM_100_TO_200 = "100-200",
+  FROM_200_TO_300 = "200-300",
+  FROM_300_TO_400 = "300-400",
+  FROM_400_TO_500 = "400-500",
+  FROM_500_TO_1000 = "500-1000",
+  FROM_1000_TO_2000 = "1000-2000",
+  FROM_2000_TO_5000 = "2000-5000"
+}
+
+export enum Designation {
+
+  CEO = "CEO",
+  CTO = "CTO",
+  CFO = "CFO",
+  COO = "COO",
+  CMO = "CMO",
+  CIO = "CIO",
+  FOUNDER = "Founder",
+  CO_FOUNDER = "Co-Founder",
+  DIRECTOR = "Director",
+  VP = "Vice President",
+
+  GENERAL_MANAGER = "General Manager",
+  OPERATIONS_MANAGER = "Operations Manager",
+  SALES_MANAGER = "Sales Manager",
+  MARKETING_MANAGER = "Marketing Manager",
+  HR_MANAGER = "HR Manager",
+  PROJECT_MANAGER = "Project Manager",
+  PRODUCT_MANAGER = "Product Manager",
+  ACCOUNT_MANAGER = "Account Manager",
+
+  SOFTWARE_ENGINEER = "Software Engineer",
+  SENIOR_SOFTWARE_ENGINEER = "Senior Software Engineer",
+  TECH_LEAD = "Tech Lead",
+  ARCHITECT = "Architect",
+  DEVOPS_ENGINEER = "DevOps Engineer",
+  DATA_SCIENTIST = "Data Scientist",
+  QA_ENGINEER = "QA Engineer",
+
+  SALES_EXECUTIVE = "Sales Executive",
+  BUSINESS_DEVELOPMENT_EXECUTIVE = "Business Development Executive",
+  MARKETING_EXECUTIVE = "Marketing Executive",
+
+  HR_EXECUTIVE = "HR Executive",
+  ADMINISTRATOR = "Administrator",
+  CONSULTANT = "Consultant",
+  INTERN = "Intern",
+  OTHER = "Other",
+}
+
+
+export enum TECHNOLOGY {
+
+  REACT = "react",
+  ANGULAR = "angular",
+  VUE = "vue",
+  NEXT_JS = "next_js",
+  HTML = "html",
+  CSS = "css",
+  JAVASCRIPT = "javascript",
+  TYPESCRIPT = "typescript",
+
+  NODE_JS = "node_js",
+  EXPRESS = "express",
+  DJANGO = "django",
+  FLASK = "flask",
+  FASTAPI = "fastapi",
+  LARAVEL = "laravel",
+  SPRING_BOOT = "spring_boot",
+  DOT_NET = "dot_net",
+  RUBY_ON_RAILS = "ruby_on_rails",
+  PHP = "php",
+
+  MONGODB = "mongodb",
+  MYSQL = "mysql",
+  POSTGRESQL = "postgresql",
+  SQLITE = "sqlite",
+  REDIS = "redis",
+  ELASTICSEARCH = "elasticsearch",
+
+  AWS = "aws",
+  AZURE = "azure",
+  GOOGLE_CLOUD = "google_cloud",
+  DOCKER = "docker",
+  KUBERNETES = "kubernetes",
+  NGINX = "nginx",
+  VERCEL = "vercel",
+  NETLIFY = "netlify",
+
+  WORDPRESS = "wordpress",
+  SHOPIFY = "shopify",
+  MAGENTO = "magento",
+  WEBFLOW = "webflow",
+  WIX = "wix",
+  SQUARESPACE = "squarespace",
+
+  HUBSPOT = "hubspot",
+  SALESFORCE = "salesforce",
+  ZOHO_CRM = "zoho_crm",
+  PIPEDRIVE = "pipedrive",
+  FRESHSALES = "freshsales",
+  MICROSOFT_DYNAMICS = "microsoft_dynamics",
+
+  MAILCHIMP = "mailchimp",
+  ACTIVE_CAMPAIGN = "active_campaign",
+  MARKETO = "marketo",
+  KLAVIYO = "klaviyo",
+
+  GOOGLE_ANALYTICS = "google_analytics",
+  HOTJAR = "hotjar",
+  MIXPANEL = "mixpanel",
+
+  STRIPE = "stripe",
+  PAYPAL = "paypal",
+  RAZORPAY = "razorpay",
+
+  ANDROID = "android",
+  IOS = "ios",
+  REACT_NATIVE = "react_native",
+  FLUTTER = "flutter",
+
+  PYTHON = "python",
+  TENSORFLOW = "tensorflow",
+  PYTORCH = "pytorch",
+  PANDAS = "pandas",
+  NUMPY = "numpy",
+}
+
+
+export enum PHONE_NUMBER_STATUS {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  DELETED = "deleted"
+}
+
+
+
+
+export enum COUNTRY {
+  AFGHANISTAN = "Afghanistan",
+  ALAND_ISLANDS = "Aland Islands",
+  ALBANIA = "Albania",
+  ALGERIA = "Algeria",
+  AMERICAN_SAMOA = "American Samoa",
+  ANDORRA = "Andorra",
+  ANGOLA = "Angola",
+  ANGUILLA = "Anguilla",
+  ANTARCTICA = "Antarctica",
+  ANTIGUA_AND_BARBUDA = "Antigua and Barbuda",
+  ARGENTINA = "Argentina",
+  ARMENIA = "Armenia",
+  ARUBA = "Aruba",
+  AUSTRALIA = "Australia",
+  AUSTRIA = "Austria",
+  AZERBAIJAN = "Azerbaijan",
+  BAHAMAS = "Bahamas",
+  BAHRAIN = "Bahrain",
+  BANGLADESH = "Bangladesh",
+  BARBADOS = "Barbados",
+  BELARUS = "Belarus",
+  BELGIUM = "Belgium",
+  BELIZE = "Belize",
+  BENIN = "Benin",
+  BERMUDA = "Bermuda",
+  BHUTAN = "Bhutan",
+  BOLIVIA = "Bolivia",
+  BOSNIA_AND_HERZEGOVINA = "Bosnia and Herzegovina",
+  BOTSWANA = "Botswana",
+  BOUVET_ISLAND = "Bouvet Island",
+  BRAZIL = "Brazil",
+  BRITISH_INDIAN_OCEAN_TERRITORY = "British Indian Ocean Territory",
+  BRUNEI = "Brunei",
+  BULGARIA = "Bulgaria",
+  BURKINA_FASO = "Burkina Faso",
+  BURUNDI = "Burundi",
+  CAMBODIA = "Cambodia",
+  CAMEROON = "Cameroon",
+  CANADA = "Canada",
+  CAPE_VERDE = "Cape Verde",
+  CAYMAN_ISLANDS = "Cayman Islands",
+  CENTRAL_AFRICAN_REPUBLIC = "Central African Republic",
+  CHAD = "Chad",
+  CHILE = "Chile",
+  CHINA = "China",
+  CHRISTMAS_ISLAND = "Christmas Island",
+  COCOS_KEELING_ISLANDS = "Cocos (Keeling) Islands",
+  COLOMBIA = "Colombia",
+  COMOROS = "Comoros",
+  CONGO = "Congo",
+  CONGO_DEMOCRATIC_REPUBLIC = "Democratic Republic of the Congo",
+  COOK_ISLANDS = "Cook Islands",
+  COSTA_RICA = "Costa Rica",
+  COTE_DIVOIRE = "Côte d'Ivoire",
+  CROATIA = "Croatia",
+  CUBA = "Cuba",
+  CYPRUS = "Cyprus",
+  CZECH_REPUBLIC = "Czech Republic",
+  DENMARK = "Denmark",
+  DJIBOUTI = "Djibouti",
+  DOMINICA = "Dominica",
+  DOMINICAN_REPUBLIC = "Dominican Republic",
+  ECUADOR = "Ecuador",
+  EGYPT = "Egypt",
+  EL_SALVADOR = "El Salvador",
+  EQUATORIAL_GUINEA = "Equatorial Guinea",
+  ERITREA = "Eritrea",
+  ESTONIA = "Estonia",
+  ESWATINI = "Eswatini",
+  ETHIOPIA = "Ethiopia",
+  FIJI = "Fiji",
+  FINLAND = "Finland",
+  FRANCE = "France",
+  GABON = "Gabon",
+  GAMBIA = "Gambia",
+  GEORGIA = "Georgia",
+  GERMANY = "Germany",
+  GHANA = "Ghana",
+  GREECE = "Greece",
+  GREENLAND = "Greenland",
+  GRENADA = "Grenada",
+  GUAM = "Guam",
+  GUATEMALA = "Guatemala",
+  GUERNSEY = "Guernsey",
+  GUINEA = "Guinea",
+  GUINEA_BISSAU = "Guinea-Bissau",
+  GUYANA = "Guyana",
+  HAITI = "Haiti",
+  HONDURAS = "Honduras",
+  HONG_KONG = "Hong Kong",
+  HUNGARY = "Hungary",
+  ICELAND = "Iceland",
+  INDIA = "India",
+  INDONESIA = "Indonesia",
+  IRAN = "Iran",
+  IRAQ = "Iraq",
+  IRELAND = "Ireland",
+  ISLE_OF_MAN = "Isle of Man",
+  ISRAEL = "Israel",
+  ITALY = "Italy",
+  JAMAICA = "Jamaica",
+  JAPAN = "Japan",
+  JERSEY = "Jersey",
+  JORDAN = "Jordan",
+  KAZAKHSTAN = "Kazakhstan",
+  KENYA = "Kenya",
+  KUWAIT = "KuwAIT",
+  KYRGYZSTAN = "Kyrgyzstan",
+  LAOS = "Laos",
+  LATVIA = "Latvia",
+  LEBANON = "Lebanon",
+  LESOTHO = "Lesotho",
+  LIBERIA = "Liberia",
+  LIBYA = "Libya",
+  LIECHTENSTEIN = "Liechtenstein",
+  LITHUANIA = "Lithuania",
+  LUXEMBOURG = "Luxembourg",
+  MADAGASCAR = "Madagascar",
+  MALAWI = "Malawi",
+  MALAYSIA = "Malaysia",
+  MALDIVES = "Maldives",
+  MALI = "Mali",
+  MALTA = "Malta",
+  MAURITANIA = "Mauritania",
+  MAURITIUS = "Mauritius",
+  MEXICO = "Mexico",
+  MOLDOVA = "Moldova",
+  MONACO = "Monaco",
+  MONGOLIA = "Mongolia",
+  MONTENEGRO = "Montenegro",
+  MOROCCO = "Morocco",
+  MOZAMBIQUE = "Mozambique",
+  MYANMAR = "Myanmar",
+  NAMIBIA = "Namibia",
+  NEPAL = "Nepal",
+  NETHERLANDS = "Netherlands",
+  NEW_ZEALAND = "New Zealand",
+  NICARAGUA = "Nicaragua",
+  NIGER = "Niger",
+  NIGERIA = "Nigeria",
+  NORTH_KOREA = "North Korea",
+  NORTH_MACEDONIA = "North Macedonia",
+  NORWAY = "Norway",
+  OMAN = "Oman",
+  PAKISTAN = "Pakistan",
+  PANAMA = "Panama",
+  PAPUA_NEW_GUINEA = "Papua New Guinea",
+  PARAGUAY = "Paraguay",
+  PERU = "Peru",
+  PHILIPPINES = "Philippines",
+  POLAND = "Poland",
+  PORTUGAL = "Portugal",
+  PUERTO_RICO = "Puerto Rico",
+  QATAR = "Qatar",
+  ROMANIA = "Romania",
+  RUSSIA = "Russia",
+  RWANDA = "Rwanda",
+  SAUDI_ARABIA = "Saudi Arabia",
+  SENEGAL = "Senegal",
+  SERBIA = "Serbia",
+  SINGAPORE = "Singapore",
+  SLOVAKIA = "Slovakia",
+  SLOVENIA = "Slovenia",
+  SOUTH_AFRICA = "South Africa",
+  SOUTH_KOREA = "South Korea",
+  SPAIN = "Spain",
+  SRI_LANKA = "Sri Lanka",
+  SUDAN = "Sudan",
+  SURINAME = "Suriname",
+  SWEDEN = "Sweden",
+  SWITZERLAND = "Switzerland",
+  SYRIA = "Syria",
+  TAIWAN = "Taiwan",
+  TAJIKISTAN = "Tajikistan",
+  TANZANIA = "Tanzania",
+  THAILAND = "Thailand",
+  TOGO = "Togo",
+  TONGA = "Tonga",
+  TRINIDAD_AND_TOBAGO = "Trinidad and Tobago",
+  TUNISIA = "Tunisia",
+  TURKEY = "Turkey",
+  TURKMENISTAN = "Turkmenistan",
+  UGANDA = "Uganda",
+  UKRAINE = "Ukraine",
+  UNITED_ARAB_EMIRATES = "United Arab Emirates",
+  UNITED_KINGDOM = "United Kingdom",
+  UNITED_STATES = "United States",
+  URUGUAY = "Uruguay",
+  UZBEKISTAN = "Uzbekistan",
+  VENEZUELA = "Venezuela",
+  VIETNAM = "Vietnam",
+  YEMEN = "Yemen",
+  ZAMBIA = "Zambia",
+  ZIMBABWE = "Zimbabwe"
+}
+export enum TemplateStatus {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  DRAFT = "draft",
+  ARCHIVED = "archived",
+}
+
+export enum TemplateCategory {
+  MARKETING = "marketing",
+  TRANSACTIONAL = "transactional",
+  FOLLOW_UP = "follow up",
+  WELCOME = "welcome",
+  INVOICE = "invoice",
+  QUOTATION = "quotation",
+  LEAD = "lead",
+  DEAL = "deal",
+  CUSTOM = "custom",
+}
+
+export enum DESIGNATION {
+  CEO = "CEO",
+  CTO = "CTO",
+  CFO = "CFO",
+  COO = "COO",
+  CMO = "CMO",
+  CIO = "CIO",
+  FOUNDER = "Founder",
+  CO_FOUNDER = "Co-Founder",
+  DIRECTOR = "Director",
+  VICE_PRESIDENT = "Vice President",
+  GENERAL_MANAGER = "General Manager",
+  OPERATIONS_MANAGER = "Operations Manager",
+  SALES_MANAGER = "Sales Manager",
+  MARKETING_MANAGER = "Marketing Manager",
+  HR_MANAGER = "HR Manager",
+  PROJECT_MANAGER = "Project Manager",
+  PRODUCT_MANAGER = "Product Manager",
+  ACCOUNT_MANAGER = "Account Manager",
+  SOFTWARE_ENGINEER = "Software Engineer",
+  SENIOR_SOFTWARE_ENGINEER = "Senior Software Engineer",
+  TECH_LEAD = "Tech Lead",
+  ARCHITECT = "Architect",
+  DEVOPS_ENGINEER = "DevOps Engineer",
+  DATA_SCIENTIST = "Data Scientist",
+  QA_ENGINEER = "QA Engineer",
+  SALES_EXECUTIVE = "Sales Executive",
+  BUSINESS_DEVELOPMENT_EXECUTIVE = "Business Development Executive",
+  MARKETING_EXECUTIVE = "Marketing Executive",
+  HR_EXECUTIVE = "HR Executive",
+  ADMINISTRATOR = "Administrator",
+  CONSULTANT = "Consultant",
+  INTERN = "Intern",
+  OTHER = "Other",
+}
+
+export enum NUMBER_OF_EMPLOYEES {
+  FIFTY = "50",
+  FIFTY_TO_100 = "50-100",
+  HUNDRED_TO_200 = "100-200",
+  TWO_HUNDRED_TO_300 = "200-300",
+  THREE_HUNDRED_TO_400 = "300-400",
+  FOUR_HUNDRED_TO_500 = "400-500",
+  FIVE_HUNDRED_TO_1000 = "500-1000",
+  THOUSAND_TO_2000 = "1000-2000",
+  TWO_THOUSAND_TO_5000 = "2000-5000",
+}
+
+export enum INFO_TYPE {
+  PEOPLE = "people",
+  COMPANY = "company",
+}
+
+export enum STATUS_CONFIG {
+  INTERESTED = "interested",
+  NOT_INTERESTED = "not_interested",
+  CONNECTED = "connected",
+  NOT_CONNECTED = "not_connected",
+  NOT_REACHED = "not_reached",
+}
+
+export const COLOR_OPTIONS: ColorOption[] = [
+  { label: "White", bg: "bg-white", text: "text-black", hex: "#ffffff" },
+  { label: "Slate", bg: "bg-slate-100", text: "text-slate-700", hex: "#64748b" },
+  { label: "Blue", bg: "bg-blue-100", text: "text-blue-700", hex: "#3b82f6" },
+  { label: "Violet", bg: "bg-violet-100", text: "text-violet-700", hex: "#8b5cf6" },
+  { label: "Emerald", bg: "bg-emerald-100", text: "text-emerald-700", hex: "#10b981" },
+  { label: "Amber", bg: "bg-amber-100", text: "text-amber-700", hex: "#f59e0b" },
+  { label: "Rose", bg: "bg-rose-100", text: "text-rose-700", hex: "#f43f5e" },
+  { label: "Cyan", bg: "bg-cyan-100", text: "text-cyan-700", hex: "#06b6d4" },
+  { label: "Orange", bg: "bg-orange-100", text: "text-orange-700", hex: "#f97316" },
+];
+
+export enum TASK_VISIBILITY {
+  GLOBAL = "global",
+  TEAM = "team",
+  PERSONAL = "personal",
+}
+export enum LeadEngagementStatus {
+  INTERESTED = "interested",
+  NOT_INTERESTED = "not_interested",
+  CONNECTED = "connected",
+  NOT_CONNECTED = "not_connected",
+  NOT_REACHED = "not_reached",
+  WRONG_NUMBER = "wrong_number",
+  MEETING_SCHEDULED = "meeting_scheduled",
+  MEETING_COMPLETED = "meeting_completed",
+  FOLLOW_UP = "follow_up",
+}
+
+export enum TASK_ACTIVITY_ACTION {
+  CREATED = "created",
+  STATUS_CHANGED = "status_changed",
+  ASSIGNED = "assigned",
+  REASSIGNED = "reassigned",
+  PRIORITY_CHANGED = "priority_changed",
+  DUE_DATE_CHANGED = "due_date_changed",
+  COMMENTED = "commented",
+  ATTACHMENT_ADDED = "attachment_added",
+  COMPLETED = "completed",
+  REOPENED = "reopened",
+  DELETED = "deleted",
+  UPDATED = "update"
+}
+
+export type TimeLogStatus = "running" | "paused" | "stopped";
+
+
+export enum FEATURE_STATUS {
+  ACTIVE = "active",
+    INACTIVE = "inactive",
+    DELETED = "deleted"
+}
+
+export enum DISCOUNT_TYPE {
+  AMOUNT = "amount",
+    PERCENTAGE = "percentage"
+}
+
+export enum CURRENCY{
+    USD = "USD",  
+    EUR = "EUR",
+    GBP = "GBP",  
+    INR = "INR", 
+    AUD = "AUD", 
+    CAD = "CAD", 
+    CHF = "CHF", 
+    CNY = "CNY", 
+    JPY = "JPY",
+    SGD = "SGD",
+    HKD = "HKD",
+    NZD = "NZD",
+    SEK = "SEK",
+    NOK = "NOK",
+    DKK = "DKK",
+    ZAR = "ZAR",
+    AED = "AED",
+    SAR = "SAR",
+    BRL = "BRL",
+    MXN = "MXN",
+    RUB = "RUB",
+    KRW = "KRW",
+
+}
+
+
+
+export enum PLAN_STATUS{
+    ACTIVE = "active",
+    INACTIVE = "inactive",
+    DELETED = "deleted",
+
+
+}
+
+
+export enum PLAN_VISIBILITY{
+    PRIVATE= "private",
+    PUBLIC = "public"
+}
+
+
+
+
+export enum COMPANY_STATUS {
+  ACTIVE = "active",
+  PENDING_VERIFICATION = "pending_verification",
+  SUSPENDED = "suspended",
+  INACTIVE = "inactive",
+  DELETED = "deleted",
+}
+
+
+export enum COUNTRY_CODE {
+  US = "US",
+  GB = "GB",
+  IN = "IN",
+  CA = "CA",
+  AU = "AU",
+  DE = "DE",
+  FR = "FR",
+  AE = "AE",
+  PK = "PK",
+  SG = "SG",
+}
+
+
+export enum BILLING_CYCLE {
+  MONTHLY = "monthly",
+  YEARLY = "yearly",
+}
+
+
+export enum SUBSCRIPTION_STATUS {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  PAUSED = "pause",
+  COMPLETED = "completed",
+  TRIAL = "trial",
+  CANCELED = "canceled",
+}
+
+
+export enum FEATURES {
+  TASK = "task:feature",
+  CRM = "crm:feature",
+  TELECOM = "telecom:feature",
+  CHAT = "chat:feature",
+  CALENDER = "calender:feature",
+  NOTE = "notes:feature",
+  SALES = "sales:feature"
+
+}
+
+
+export enum NotificationType {
+  EVENT_CREATED = "event_created",
+  EVENT_UPDATED = "event_updated",
+  EVENT_DELETED = "event_deleted",
+  EVENT_REMINDER = "event_reminder",
+  TASK_CREATED = "task_created",
+  TASK_UPDATED = "task_updated",
+  TASK_ASSIGNED = "task_assigned",
+  TASK_COMPLETED = "task_completed",
+  TASK_OVERDUE = "task_overdue",
+  DEAL_CREATED = "deal_created",
+  DEAL_UPDATED = "deal_updated",
+  DEAL_STAGE_CHANGED = "deal_stage_changed",
+  DEAL_WON = "deal_won",
+  DEAL_LOST = "deal_lost",
+  LEAD_CREATED = "lead_created",
+  LEAD_ASSIGNED = "lead_assigned",
+  LEAD_UPDATED = "lead_updated",
+  LEAD_CONVERTED = "lead_converted",
+  QUOTATION_CREATED = "quotation_created",
+  QUOTATION_SENT = "quotation_sent",
+  QUOTATION_ACCEPTED = "quotation_accepted",
+  QUOTATION_REJECTED = "quotation_rejected",
+  INVOICE_CREATED = "invoice_created",
+  INVOICE_PAID = "invoice_paid",
+  INVOICE_OVERDUE = "invoice_overdue",
+  USER_INVITED = "user_invited",
+  USER_REGISTERED = "user_registered",
+  GENERAL = "general",
+  SYSTEM = "system",
+}
+
+export enum NotificationEntityType {
+  EVENT = "event",
+  TASK = "task",
+  DEAL = "deal",
+  LEAD = "lead",
+  QUOTATION = "quotation",
+  INVOICE = "invoice",
+  USER = "user",
+  COMPANY = "company",
+  GENERAL = "general",
+  SYSTEM = "system",
+}
+
+export enum NotificationStatus {
+  UNREAD = "unread",
+  READ = "read",
+  ARCHIVED = "archived",
+}
+
+export enum NotificationPriority {
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  URGENT = "urgent",
+}

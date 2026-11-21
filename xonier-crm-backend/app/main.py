@@ -1,0 +1,125 @@
+from fastapi import FastAPI, HTTPException
+from app.core.exception_handler import http_exception_handler, app_exception_handler
+from app.utils.custom_exception import AppException
+from fastapi.responses import JSONResponse
+from dotenv import load_dotenv
+load_dotenv()
+
+from contextlib import asynccontextmanager
+from app.db.db import connect_db
+from app.utils.custom_response import ApiResponse
+from fastapi.middleware.cors import CORSMiddleware
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.errors import RateLimitExceeded
+from app.core.rate_limiter import limiter
+from app.core.config import get_setting
+from app.middlewares.auth_middleware import AuthMiddleware
+from app.core.cache import init_cache
+from app.middlewares.tanent_middleware import TenantMiddleware
+
+# Routes
+
+from app.routes.user_role_route import router as user_role_router
+from app.routes.auth_routes import router as auth_router
+from app.routes.permission_route import router as permission_router
+from app.routes.team_route import router as team_router
+from app.routes.team_category_route import router as team_category_route
+from app.routes.task_category_route import router as task_category_route
+from app.routes.task_status_route import router as task_status_route
+from app.routes.task_route import router as task_route
+from app.routes.otp_route import router as otp_route
+from app.routes.task_report_route import router as task_report_route
+from app.routes.sub_task_route import router as sub_task_route
+from app.routes.task_timelog_route import router as task_timelog_route
+from app.routes.plan_route import router as plan_route
+from app.routes.feature_route import router as feature_route
+from app.routes.company_route import router as company_route
+from app.routes.subscription_route import router as subscription_route
+from app.routes.notification_route import router as notification_router
+
+settings = get_setting()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await connect_db()
+    await init_cache()
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
+
+
+origins = [
+    settings.CLIENT_URL,
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       
+    allow_credentials=True,    
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(TenantMiddleware)
+
+
+app.state.limiter = limiter
+
+
+app.add_middleware(SlowAPIMiddleware)
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request, exc):
+    return JSONResponse(
+    status_code=429,
+    content={
+        "success": False,
+        "error": {
+            "code": "RATE_LIMIT_EXCEEDED",
+            "message": "Too many requests"
+        }
+    }
+)
+    
+
+app.add_middleware(AuthMiddleware)
+
+
+app.include_router(user_role_router, prefix="/api/user-role")
+app.include_router(auth_router, prefix="/api/auth")
+app.include_router(permission_router, prefix="/api/permission")
+app.include_router(team_router, prefix="/api/team")
+app.include_router(team_category_route, prefix="/api/team-category")
+app.include_router(task_category_route, prefix="/api/task-category")
+app.include_router(task_status_route, prefix="/api/task-status")
+app.include_router(task_route, prefix="/api/task")
+app.include_router(otp_route, prefix="/api/otp")
+app.include_router(task_report_route, prefix="/api/task-reports")
+app.include_router(sub_task_route, prefix="/api/sub-task")
+app.include_router(task_timelog_route, prefix="/api/task")
+app.include_router(plan_route, prefix="/api/plan")
+app.include_router(feature_route, prefix="/api/feature")
+app.include_router(company_route, prefix="/api/companies")
+app.include_router(subscription_route, prefix="/api/subscription")
+app.include_router(notification_router, prefix="/api/v1/notifications", tags=["Notifications"])
+
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(AppException, app_exception_handler)
+
+
+@app.get("/")
+def welcome():
+    return {"message": "Task Workspace API"}
+
+
+@app.get("/health")
+def health():
+    return {"success": True}

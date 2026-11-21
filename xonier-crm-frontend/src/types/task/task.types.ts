@@ -1,0 +1,346 @@
+import { Dispatch, SetStateAction } from "react";
+import { CategoryItem } from "./category.types";
+import { StatusItem } from "./status.types";
+import { Timestamp } from "next/dist/server/lib/cache-handlers/types";
+import { User } from "../auth/auth.types";
+import { TASK_ACTIVITY_ACTION } from "@/src/constants/enum";
+import { TaskTimerEntry } from "./taskTimer.types";
+
+
+export type DateLike = string | Date | Timestamp | null;
+
+export enum TASK_PRIORITY {
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  URGENT = "urgent",
+}
+
+export enum TASK_ENTITY_TYPE {
+  PROJECT = "project",
+  LEAD = "lead",
+  DEAL = "deal",
+  ENQUIRY = "enquiry",
+  CONTACT = "contact",
+  GENERAL = "general",
+}
+
+export enum RECURRENCE_TYPE {
+  daily = "daily",
+  weekly = "weekly",
+  monthly = "monthly",
+}
+
+
+export interface CreateTaskPayload {
+  title: string;
+  description?: string;
+  category: string;
+  status?: string;
+  priority: TASK_PRIORITY;
+  entityType?: TASK_ENTITY_TYPE;
+  entityId?: string;
+  entityName?: string;
+  assignedTo: string[];
+  dueDate?: DateLike;
+  startDate?: DateLike;
+  estimatedHours?: number;
+  isRecurring: boolean;
+  recurrenceType?: RECURRENCE_TYPE;
+  recurrenceEndsAt?: DateLike;
+  tags: string[];
+  attachments: string[];
+  parentTask?: string | null;
+  order: number;
+}
+
+export interface UpdateTaskPayload {
+  title: string;
+  description?: string;
+  priority?: TASK_PRIORITY;
+  dueDate?: DateLike;
+  startDate?: DateLike;
+  estimatedHours?: number;
+  actualHours?: number;
+  isRecurring?: boolean;
+  recurrenceType?: RECURRENCE_TYPE;
+  recurrenceEndsAt?: DateLike;
+  tags?: string[];
+  attachments?: string[];
+  entityType?: TASK_ENTITY_TYPE;
+  entityId?: string;
+  entityName?: string;
+  assignedTo?: string[];
+  category: string;
+  status: string;
+}
+
+export interface UpdateTaskStatusPayload {
+  status: string;
+  category?: string;
+  order?: number;
+  actual_hours?: number;
+  actual_days?: number;
+  rating?: number;
+}
+
+export interface UpdateTaskPriorityPayload {
+  priority: TASK_PRIORITY;
+}
+
+export interface AssignTaskPayload {
+  assignedTo: string[];
+}
+
+export interface BulkAssignTaskPayload {
+  taskIds: string[];
+  assignedTo: string[];
+}
+
+export interface BulkStatusUpdatePayload {
+  taskIds: string[];
+  status: string;
+}
+
+export interface MoveTaskPayload {
+  status: string;
+  order?: number;
+  category?: string;
+}
+
+export interface ReorderTaskPayload {
+  tasks: { id: string; order: number }[];
+}
+
+export interface AddWatcherPayload {
+  userId: string;
+}
+
+
+export interface AssignedUser {
+  id: string;
+  firstName: string;
+  lastName?: string;
+  email: string;
+  avatar?: string;
+}
+
+export interface StatusOption {
+  _id: string;
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  isDefault: boolean;
+  category: CategoryItem;
+  isFinal?:boolean;
+}
+
+export interface CategoryOption {
+  id: string;
+  name: string;
+  icon?: string;
+}
+
+export interface UserOption {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+
+export enum TimeStatus {
+    continue = "continue",
+    stopped = "stopped"
+  }
+
+export interface TaskItem {
+  id: string;
+  task_id: string;
+  title: string;
+  description: string | null;
+  category: CategoryItem;
+  categoryName?: string;
+  status: StatusItem;
+  statusName?: string;
+  statusColor?: string;
+  statusIcon?: string;
+  priority: TASK_PRIORITY;
+  entityType?: TASK_ENTITY_TYPE;
+  entityId?: string;
+  entityName?: string;
+  assignedTo: AssignedUser[];
+  dueDate?: string | null;
+  startDate?: string | null;
+  completedAt?: string;
+  estimatedHours?: number;
+  actualHours?: number;
+  isRecurring: boolean;
+  recurrenceType?: RECURRENCE_TYPE;
+  recurrenceEndsAt?: string | null;
+  tags: string[];
+  attachments: string[];
+  parentTask?: string;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: User;
+  rating?: number;
+  remark?: string;
+  actual_days?: number;
+  actual_hours?: number;
+  ratedBy?: User;
+  activities: TaskActivity;
+  totalSeconds?: number;
+  deletedAt: string | null;
+  timerStatus: TimeStatus
+  lastStartedTime?: string | null;
+
+}
+
+export interface PaginatedTaskResponse {
+  data: TaskItem[];
+  page: number | string;
+  limit: number | string;
+  total: number;
+}
+
+
+
+export interface TaskActivity {
+  id: string;
+
+  task: string; 
+
+  action: TASK_ACTIVITY_ACTION;
+
+  field?: string;
+
+  oldValue?: string;
+
+  newValue?: string;
+
+  description: string;
+
+  metadata?: Record<string, any>;
+
+  performedBy: User;
+
+  createdAt: string; 
+}
+
+export interface CreateSubTaskPayload {
+  title: string;
+  actualHours?: number;
+  dueDate?: Date | Timestamp | null;
+  order: number;
+}
+
+export interface UpdateSubTaskPayload {
+  title?: string;
+  isCompleted?: boolean;
+}
+
+
+export interface FinalStatusPayload extends UpdateTaskStatusPayload {
+  remark?: string;
+  feedbackStars?: number;
+  actualHours?: number;
+}
+
+export interface PendingDrop {
+  task: TaskItem;
+  targetStatus: StatusOption;
+  categoryId: string;
+}
+
+export interface CategoryBoardProps {
+  categoryId: string;
+  categoryName: string;
+  categoryColor: string;
+  categoryIcon: string;
+  tasks: TaskItem[];
+  statuses: StatusOption[];
+  canEdit: boolean;
+  canRemark: boolean;
+  canDelete: boolean;
+  canViewTimer: boolean;
+  canStartTimer: boolean;
+  canPauseTimer: boolean;
+  canResumeTimer: boolean;
+  canStopTimer: boolean;
+  canChangeStatus: boolean;
+  canMarkFinal: boolean;
+  deleting: boolean;
+  taskTimerMap: Map<string, TaskTimerEntry>;
+  activeTimerTaskId: string | null;
+  liveElapsedSeconds: number;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onStatusChange: (taskId: string, payload: FinalStatusPayload) => Promise<void>;
+  onRemark: (task: TaskItem) => void;
+  onTimer: (task: TaskItem) => void;
+  onStop: (task: TaskItem) => void;
+}
+
+export interface BoardViewProps {
+  tasks: TaskItem[];
+  statusOptions: StatusOption[];
+  canEdit: boolean;
+  canRemark: boolean;
+  canDelete: boolean;
+  canViewTimer: boolean;
+  canStartTimer: boolean;
+  canPauseTimer: boolean;
+  canResumeTimer: boolean;
+  canStopTimer: boolean;
+  canChangeStatus: boolean;
+  canMarkFinal: boolean;
+  deleting: boolean;
+  isLoading: boolean;
+  skeletonlength: number;
+  taskTimerMap: Map<string, TaskTimerEntry>;
+  activeTimerTaskId: string | null;
+  liveElapsedSeconds: number;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onStatusChange: (taskId: string, payload: FinalStatusPayload) => Promise<void>;
+  onRemark: (task: TaskItem) => void;
+  onTimer: (task: TaskItem) => void;
+  onStop: (task: TaskItem) => void;
+}
+
+
+export interface BoardCardProps {
+  task: TaskItem;
+  canEdit: boolean;
+  canRemark: boolean;
+  canDelete: boolean;
+  canViewTimer: boolean;
+  canStartTimer: boolean;
+  canPauseTimer: boolean;
+  canResumeTimer: boolean;
+  canStopTimer: boolean;
+  deleting: boolean;
+  taskTimerMap: Map<string, TaskTimerEntry>;
+  activeTimerTaskId: string | null;
+  liveElapsedSeconds: number;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onDragStart: (e: React.DragEvent, task: TaskItem) => void;
+  onRemark: (task: TaskItem) => void;
+  onTimer: (task: TaskItem) => void;
+  onStop: (task: TaskItem) => void;
+  handleDragEnd:React.DragEventHandler<HTMLDivElement>;
+}
+
+export interface CategoryMultiSelectProps {
+  categories: CategoryItem[];
+  selected: string[];
+  onChange: (selected: string[]) => void;
+  fetchCategories: ()=> Promise<void>,
+  isCatLoading: boolean
+}
+
+export  type ViewMode = "list" | "board";

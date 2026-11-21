@@ -1,0 +1,43 @@
+from beanie import Document, Link
+from pydantic import Field
+from beanie import PydanticObjectId
+from datetime import datetime, timezone
+from typing import Optional, Dict
+from app.core.enums import ACTIVITY_ENTITY_TYPE, ACTIVITY_ACTION
+from pymongo import IndexModel
+from app.db.models.user_model import UserModel
+from app.db.models.base_model import BaseDocument
+from app.core.constants import TIME_ZONE
+
+
+
+class ActivityModel(BaseDocument):
+    userId: Link[UserModel]
+    entityType: ACTIVITY_ENTITY_TYPE
+    entityId: Optional[PydanticObjectId] = None
+
+    perform: int = 1
+
+    action: ACTIVITY_ACTION
+    title: str                   
+    description: Optional[str] = None
+  
+
+    ipAddress: Optional[str] = None
+    userAgent: Optional[str] = None
+
+    metadata: Optional[Dict] = None
+
+    createdAt: datetime = Field(
+        # Keep the full IST timestamp. Using .date() silently stored every
+        # activity at midnight and made call-history times display as 12:00 am.
+        default_factory=lambda: datetime.now(TIME_ZONE)
+    )
+
+    class Settings:
+        name = "activities"
+        indexes = [
+            IndexModel([("userId", 1)], name="userId"),
+            IndexModel([("entityType",1)], name="entityType"),
+            IndexModel([("createdAt", -1)], name="createdAt")
+        ]

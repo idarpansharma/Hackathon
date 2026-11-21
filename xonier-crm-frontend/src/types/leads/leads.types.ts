@@ -1,0 +1,133 @@
+import { COUNTRY_CODE, EMPLOYEE_SENIORITY, INDUSTRIES, LANGUAGE_CODE, LEAD_SOURCE_TYPE, PRIORITY, PROJECT_TYPES, SALES_STATUS, SOURCE ,LeadEngagementStatus} from "@/src/constants/enum";
+import { User } from "../auth/auth.types";
+
+export interface Lead {
+  id: string;                
+  lead_id: string;
+
+  fullName: string;
+  email: string;              
+  phone: string;
+  linkedin?: string | null;
+
+  priority: PRIORITY;
+  source: string;
+  projectType: PROJECT_TYPES;
+  status: string;
+  disqualifiedReason?: string | null;
+  disqualifiedAt?: string | null;
+  leadSource: LEAD_SOURCE_TYPE
+  createdBy: User;          
+  updatedBy?: User | null;  
+
+  companyName?: string | null;
+  organizationId?: string | null;
+  personId?: string | null;
+  organization?: {
+    id: string;
+    name: string;
+    industry?: string | null;
+    size?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    website?: string | null;
+    city?: string | null;
+    country?: string | null;
+    address?: string | null;
+    notes?: string | null;
+    cnpj?: string | null;
+  } | null;
+  person?: {
+    id: string;
+    fullName: string;
+    organizationId?: string | null;
+    organizationName?: string | null;
+    title?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    linkedin?: string | null;
+    city?: string | null;
+    country?: string | null;
+    notes?: string | null;
+  } | null;
+  city?: string | null;
+  country?: COUNTRY_CODE | null;
+  postalCode?: number | null;
+  language?: LANGUAGE_CODE | null;
+
+  industry?: INDUSTRIES | null;
+  employeeRole?: string | null;
+  employeeSeniority?: EMPLOYEE_SENIORITY | null;
+
+  assignedTo?: User[] | null;   
+  assignedBy?: User | null;     
+  assignedAt?: string | null;   
+  isAssigned?: boolean;     
+  dataTag?: string | null;
+
+  message?: string | null;
+  membershipNotes?: string | null;
+
+  inDeal?: boolean
+  connectStatus?: string | null;
+  followUpAt?: string | null;   // ISO datetime — when the next follow-up is due
+  campaign?: string | null;
+  createdAt: string;          
+  updatedAt: string;          
+  deletedAt?: string | null;
+  extraFields?: Record<string, string | number | boolean | null> | null;
+}
+
+export interface LeadPayload {
+  assigneeId?: string;
+  fullName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  linkedin?: string | null;
+
+  priority?: PRIORITY | "";
+  source?: string | "";
+  projectType?: string | "";
+  status?: string;
+
+  companyName?: string;
+  organizationId?: string | null;
+  personId?: string | null;
+  cnpj?: string | null;
+  city?: string;
+  country?: string | null;
+  postalCode?: number | null;
+  language?: LANGUAGE_CODE | null;
+  
+
+  industry?: INDUSTRIES | null;
+  employeeRole?: string;
+  employeeSeniority?: EMPLOYEE_SENIORITY | null;
+
+  message?: string | null;
+  membershipNotes?: string | null;
+
+  extraFields?: Record<string, string | number | boolean | null> | null;
+}
+
+export interface BulkLeadPayload {
+  dataTag?: string | null;
+  leads: LeadPayload[];
+}
+
+export interface UpdateLeadStatusPayload {
+  status: string
+}
+
+export interface DisqualifyLeadPayload { reason: string }
+
+export interface BulkReassignLeadSchema{
+    userId: string;
+    leadsId: Array<string>
+}
+
+
+export interface LeadEngagementStatusPayload {
+  status: LeadEngagementStatus
+  followUpIn?: string
+}
